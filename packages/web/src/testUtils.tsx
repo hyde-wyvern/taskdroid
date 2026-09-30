@@ -1,10 +1,10 @@
-import { MantineProvider } from '@mantine/core';
-import { render } from '@testing-library/react';
-import type { ReactElement } from 'react';
+import { MantineProvider } from "@mantine/core";
+import { render } from "@testing-library/react";
+import type { ReactElement } from "react";
 
 export function renderWithMantine(ui: ReactElement) {
   if (!window.matchMedia) {
-    Object.defineProperty(window, 'matchMedia', {
+    Object.defineProperty(window, "matchMedia", {
       writable: true,
       value: (query: string) => ({
         matches: false,
@@ -18,5 +18,7 @@ export function renderWithMantine(ui: ReactElement) {
       }),
     });
   }
-  return render(<MantineProvider defaultColorScheme="light">{ui}</MantineProvider>);
+  return render(
+    <MantineProvider defaultColorScheme="light">{ui}</MantineProvider>,
+  );
 }

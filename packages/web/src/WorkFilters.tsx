@@ -69,7 +69,12 @@ export function WorkFilters({
         </button>
       </div>
       <div className="filter-progress">
-        <ProgressBar className="filter-progress-bar" size={8} value={progress.percentage} label="Visible work progress" />
+        <ProgressBar
+          className="filter-progress-bar"
+          size={8}
+          value={progress.percentage}
+          label="Visible work progress"
+        />
         <small>
           {progress.percentage}% - {progress.completedEffort}/
           {progress.totalEffort} points
