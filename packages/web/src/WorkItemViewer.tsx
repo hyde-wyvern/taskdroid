@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
+import { IconPencil } from "@tabler/icons-react";
 import { DetailHeader } from "./DetailHeader";
 import type { Crumb } from "./Breadcrumbs";
-import { DialogShell, ProgressBar, TaskButton } from "./Controls";
+import { DialogShell, IconAction, ProgressBar } from "./Controls";
 
 type TextSection = { label: string; value: string; empty: string };
 type Progress = {
@@ -45,6 +46,15 @@ export function WorkItemViewer({
         title={title}
         titleClassName={closed ? "closed-title" : undefined}
         crumbs={crumbs}
+        keyAction={
+          onEdit ? (
+            <IconAction
+              label={editLabel}
+              icon={<IconPencil size={18} />}
+              onClick={onEdit}
+            />
+          ) : undefined
+        }
         onClose={onClose}
       />
       <div className="details-view">
@@ -78,16 +88,12 @@ export function WorkItemViewer({
           </section>
         )}
       </div>
-      <footer>
-        {leadingAction}
-        <span />
-        <TaskButton onClick={onClose}>Close</TaskButton>
-        {onEdit && (
-          <TaskButton variant="primary" aria-label={editLabel} onClick={onEdit}>
-            Edit
-          </TaskButton>
-        )}
-      </footer>
+      {leadingAction && (
+        <footer>
+          {leadingAction}
+          <span />
+        </footer>
+      )}
     </DialogShell>
   );
 }

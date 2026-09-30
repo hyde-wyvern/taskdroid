@@ -1,10 +1,11 @@
 import type { Subtask, Task, Workflow } from "./types";
+import { IconRestore, IconTrash } from "@tabler/icons-react";
 import { sortByWorkPriority, sortNewest } from "./sortNewest";
 import { NumberInput, TextInput, Textarea } from "@mantine/core";
 import { useEffect, useState } from "react";
 
 import { DetailHeader } from "./DetailHeader";
-import { DialogShell, TaskButton } from "./Controls";
+import { DialogShell, IconAction, TaskButton } from "./Controls";
 import { EffortSelect } from "./EffortSelect";
 import { IssueKey } from "./IssueKey";
 import { StatusSelect } from "./StatusSelect";
@@ -250,13 +251,13 @@ export function TaskEditor({
         }}
         leadingAction={
           archived ? (
-            <button
+            <IconAction
+              label="Restore task"
+              icon={<IconRestore size={18} />}
               onClick={() =>
                 void run(() => api.restoreTask(task), "Task restored")
               }
-            >
-              Restore task
-            </button>
+            />
           ) : undefined
         }
         onEdit={archived ? undefined : startEditing}
@@ -349,13 +350,12 @@ export function TaskEditor({
                 }
                 label={`${subtask.title} status`}
               />
-              <TaskButton
-                variant="danger"
-                className="danger-link"
+              <IconAction
+                label={`Archive ${subtask.title}`}
+                icon={<IconTrash size={18} />}
+                danger
                 onClick={() => void archiveSubtask(subtask)}
-              >
-                Archive
-              </TaskButton>
+              />
             </div>
           ))}
           {newSubtasks.map((subtask, index) => (
@@ -407,13 +407,13 @@ export function TaskEditor({
               <span>{subtask.title}</span>
               <span>{subtask.effort} pts</span>
               <span>Archived</span>
-              <TaskButton
+              <IconAction
+                label={`Restore ${subtask.title}`}
+                icon={<IconRestore size={18} />}
                 onClick={() =>
                   void run(() => api.restoreSubtask(task, subtask.id))
                 }
-              >
-                Restore
-              </TaskButton>
+              />
             </div>
           ))}
         </div>
@@ -421,6 +421,7 @@ export function TaskEditor({
       <footer>
         <TaskButton
           variant="danger"
+          leftSection={<IconTrash size={18} />}
           onClick={() => void run(() => api.archiveTask(task), "Task archived")}
         >
           Archive task

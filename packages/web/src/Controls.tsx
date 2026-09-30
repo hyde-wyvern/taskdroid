@@ -36,11 +36,13 @@ export function IconAction({
   icon,
   onClick,
   disabled = false,
+  danger = false,
 }: {
   label: string;
   icon: ReactNode;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   disabled?: boolean;
+  danger?: boolean;
 }) {
   return (
     <Tooltip label={label} withArrow openDelay={500}>
@@ -49,6 +51,7 @@ export function IconAction({
         onClick={onClick}
         disabled={disabled}
         variant="subtle"
+        color={danger ? "red" : undefined}
         size={32}
       >
         {icon}

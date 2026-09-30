@@ -396,6 +396,12 @@ textarea {
   gap: 8px;
   min-width: 0;
 }
+.detail-key-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+}
 .detail-header h2 {
   line-height: 1.2;
 }
@@ -876,9 +882,13 @@ textarea {
 .plan-card-heading > button {
   border: 0;
   padding: 0;
+  background: transparent;
   text-align: left;
   font-size: 16px;
   font-weight: 750;
+}
+.plan-card-heading > button:hover {
+  background: transparent;
 }
 .plan-card > p {
   min-height: 38px;

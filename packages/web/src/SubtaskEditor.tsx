@@ -1,4 +1,5 @@
 import { NumberInput, TextInput, Textarea } from "@mantine/core";
+import { IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import type { Subtask, Task, Workflow } from "./types";
 
@@ -201,7 +202,11 @@ export function SubtaskEditor({
         />
       </>
       <footer>
-        <TaskButton variant="danger" onClick={() => void archive()}>
+        <TaskButton
+          variant="danger"
+          leftSection={<IconTrash size={18} />}
+          onClick={() => void archive()}
+        >
           Archive subtask
         </TaskButton>
         <span />

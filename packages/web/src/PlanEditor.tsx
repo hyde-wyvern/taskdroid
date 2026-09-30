@@ -1,10 +1,11 @@
 import type { Plan, Task, Workflow } from "./types";
+import { IconRestore, IconTrash } from "@tabler/icons-react";
 import { sortByWorkPriority, sortNewest } from "./sortNewest";
 import { NumberInput, TextInput, Textarea } from "@mantine/core";
 import { useEffect, useState } from "react";
 
 import { DetailHeader } from "./DetailHeader";
-import { DialogShell, TaskButton } from "./Controls";
+import { DialogShell, IconAction, TaskButton } from "./Controls";
 import { EffortSelect } from "./EffortSelect";
 import { IssueKey } from "./IssueKey";
 import { StatusSelect } from "./StatusSelect";
@@ -267,7 +268,11 @@ export function PlanEditor({
         }}
         leadingAction={
           archived ? (
-            <button onClick={() => void toggleArchive()}>Restore</button>
+            <IconAction
+              label="Restore plan"
+              icon={<IconRestore size={18} />}
+              onClick={() => void toggleArchive()}
+            />
           ) : undefined
         }
         onEdit={archived ? undefined : startEditing}
@@ -352,13 +357,12 @@ export function PlanEditor({
                     }
                     label={`${task.title} status`}
                   />
-                  <TaskButton
-                    aria-label={`Archive ${task.title}`}
-                    variant="danger"
+                  <IconAction
+                    label={`Archive ${task.title}`}
+                    icon={<IconTrash size={18} />}
+                    danger
                     onClick={() => void archiveTask(task)}
-                  >
-                    Archive
-                  </TaskButton>
+                  />
                 </div>
               ))}
               {newTasks.map((task, index) => (
@@ -408,9 +412,11 @@ export function PlanEditor({
                   <span>{task.title}</span>
                   <span>{task.effort} pts</span>
                   <span>Archived</span>
-                  <TaskButton onClick={() => void restoreTask(task)}>
-                    Restore
-                  </TaskButton>
+                  <IconAction
+                    label={`Restore ${task.title}`}
+                    icon={<IconRestore size={18} />}
+                    onClick={() => void restoreTask(task)}
+                  />
                 </div>
               ))}
             </div>
@@ -419,7 +425,11 @@ export function PlanEditor({
       </>
       <footer>
         {plan && (
-          <TaskButton variant="danger" onClick={() => void toggleArchive()}>
+          <TaskButton
+            variant="danger"
+            leftSection={<IconTrash size={18} />}
+            onClick={() => void toggleArchive()}
+          >
             Archive
           </TaskButton>
         )}
