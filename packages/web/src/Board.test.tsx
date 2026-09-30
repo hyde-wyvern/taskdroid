@@ -104,6 +104,48 @@ describe("Board", () => {
     ]);
   });
 
+  it("creates a task from the quick-create form and refreshes the board", async () => {
+    const createTask = vi.spyOn(api, "createTask").mockResolvedValue({
+      ...task,
+      id: "created-task",
+      title: "Ship test",
+      effort: 13,
+    });
+    const onChanged = vi.fn().mockResolvedValue(undefined);
+    renderWithMantine(
+      <Board
+        planId="plan"
+        workflow={workflow}
+        tasks={[task]}
+        onSelect={vi.fn()}
+        onChanged={onChanged}
+        onError={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByText("+ Task"));
+    fireEvent.change(screen.getByRole("textbox", { name: "Task title" }), {
+      target: { value: "  Ship test  " },
+    });
+    fireEvent.change(
+      screen.getByRole("combobox", { name: "Task effort points" }),
+      {
+        target: { value: "13" },
+      },
+    );
+    expect(createTask).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Add" }));
+
+    await vi.waitFor(() =>
+      expect(createTask).toHaveBeenCalledWith("plan", {
+        title: "Ship test",
+        effort: 13,
+        statusId: "todo",
+      }),
+    );
+    expect(onChanged).toHaveBeenCalledOnce();
+  });
+
   it("preserves task selection and drag-and-drop status changes", async () => {
     const onSelect = vi.fn();
     const onChanged = vi.fn().mockResolvedValue(undefined);

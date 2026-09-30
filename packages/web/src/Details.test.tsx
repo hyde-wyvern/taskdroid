@@ -381,6 +381,74 @@ describe("detail dialogs", () => {
     expect(screen.getByRole("heading", { name: "Viewer task" })).toBeTruthy();
   });
 
+  it("discards subtask editor drafts on Cancel", async () => {
+    const keyedTask = {
+      ...task,
+      key: "EP-2",
+      subtasks: task.subtasks.map((item, index) => ({
+        ...item,
+        key: `EP-${index + 3}`,
+      })),
+    };
+    const updateSubtask = vi.spyOn(api, "updateSubtask").mockResolvedValue({
+      ...keyedTask,
+      revision: 2,
+      subtasks: [
+        { ...keyedTask.subtasks[0], title: "Saved subtask" },
+        keyedTask.subtasks[1],
+      ],
+    });
+    renderWithMantine(
+      <TaskEditor
+        task={keyedTask}
+        planKey="EP-1"
+        workflow={workflow}
+        archived={false}
+        onSelectPlan={vi.fn()}
+        onClose={vi.fn()}
+        onSaved={vi.fn()}
+        onError={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Done work" }));
+    fireEvent.click(screen.getByRole("button", { name: "Edit subtask" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "Title" }), {
+      target: { value: "Discarded subtask" },
+    });
+    fireEvent.change(screen.getByRole("textbox", { name: "Description" }), {
+      target: { value: "Discarded description" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(updateSubtask).not.toHaveBeenCalled();
+    expect(screen.getByRole("heading", { name: "Done work" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Edit subtask" }));
+    expect(screen.getByRole("textbox", { name: "Title" })).toHaveProperty(
+      "value",
+      "Done work",
+    );
+    expect(screen.getByRole("textbox", { name: "Description" })).toHaveProperty(
+      "value",
+      "Subtask description",
+    );
+    expect(updateSubtask).not.toHaveBeenCalled();
+    fireEvent.change(screen.getByRole("textbox", { name: "Title" }), {
+      target: { value: "Saved subtask" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    await waitFor(() =>
+      expect(updateSubtask).toHaveBeenCalledWith(
+        keyedTask,
+        "one",
+        expect.objectContaining({ title: "Saved subtask" }),
+      ),
+    );
+    await waitFor(() =>
+      expect(screen.getByRole("heading", { name: "Viewer task" })).toBeTruthy(),
+    );
+  });
+
   it("keeps task edit changes local until Save, then returns to the viewer", async () => {
     const updateTask = vi
       .spyOn(api, "updateTask")

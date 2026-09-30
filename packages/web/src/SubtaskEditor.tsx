@@ -85,6 +85,16 @@ export function SubtaskEditor({
       onError(error);
     }
   }
+
+  function cancel() {
+    setTitle(subtask.title);
+    setDescription(subtask.description);
+    setPlan(subtask.plan);
+    setEffort(subtask.effort);
+    setStatusId(subtask.statusId);
+    setEditing(false);
+  }
+
   async function archive() {
     try {
       await onTaskChanged(await api.archiveSubtask(task, subtask.id));
@@ -195,7 +205,7 @@ export function SubtaskEditor({
           Archive subtask
         </TaskButton>
         <span />
-        <TaskButton onClick={() => setEditing(false)}>Cancel</TaskButton>
+        <TaskButton onClick={cancel}>Cancel</TaskButton>
         <TaskButton
           variant="primary"
           disabled={!title.trim()}

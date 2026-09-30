@@ -1,10 +1,11 @@
 import type { Plan, Task, Workflow } from "./types";
 import { afterEach, describe, expect, it, vi } from "vitest";
 // @vitest-environment jsdom
-import { cleanup, fireEvent, screen } from "@testing-library/react";
+import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
 
 import { ListView } from "./ListView";
 import { PlansView } from "./PlansView";
+import { api } from "./api";
 import { renderWithMantine } from "./testUtils";
 
 afterEach(cleanup);
@@ -198,5 +199,33 @@ describe("project views", () => {
       screen.getByRole("button", { name: "Expand Platform plan" }),
     );
     expect(screen.getByText("Queued work")).toBeTruthy();
+  });
+
+  it("moves a task status from List and refreshes the work view", async () => {
+    const move = vi
+      .spyOn(api, "move")
+      .mockResolvedValue({ ...task, statusId: "todo", revision: 2 });
+    const onChanged = vi.fn().mockResolvedValue(undefined);
+    renderWithMantine(
+      <ListView
+        plans={[plan]}
+        tasks={[task]}
+        workflow={workflow}
+        onSelectPlan={vi.fn()}
+        onSelectTask={vi.fn()}
+        onSelectSubtask={vi.fn()}
+        onChanged={onChanged}
+        onError={vi.fn()}
+      />,
+    );
+
+    fireEvent.change(
+      screen.getByRole("combobox", { name: "Queued work status" }),
+      {
+        target: { value: "todo" },
+      },
+    );
+    await waitFor(() => expect(move).toHaveBeenCalledWith(task, "todo"));
+    expect(onChanged).toHaveBeenCalledOnce();
   });
 });
