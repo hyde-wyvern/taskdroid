@@ -21,6 +21,7 @@ export function PlanEditor({ plan: initial, tasks = [], workflow, archived, onSe
   const [newTasks, setNewTasks] = useState<Array<{ title: string; effort: number; statusId: string }>>([]);
   const [archivedTasks, setArchivedTasks] = useState<Task[]>([]);
   const toast = useToast();
+  useEffect(() => { if (!editing) setPlan(initial); }, [editing, initial]);
   useEffect(() => {
     if (!editing || !plan || archived) { setArchivedTasks([]); return; }
     let current = true;

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PlansView } from './PlansView';
 import type { Plan, Project, Workflow } from './types';
 
@@ -8,6 +8,11 @@ export function ProjectView({ project, plans, workflow, onSelect, onCreate, onMo
   const [editing, setEditing] = useState(false);
   const names = Object.keys(documents);
   const current = documents[active] ?? '';
+  useEffect(() => {
+    if (editing) return;
+    setDocuments(project.documents);
+    setActive((current) => project.documents[current] === undefined ? Object.keys(project.documents)[0] ?? '' : current);
+  }, [editing, project.documents]);
   async function save() { try { await onSave(documents); setEditing(false); } catch (error) { onError(error); } }
   function add() {
     const name = window.prompt('Markdown filename (for example, conventions.md)')?.trim();

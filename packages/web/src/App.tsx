@@ -44,10 +44,13 @@ function TaskdroidApp() {
   }, [view]);
 
   const loadTasks = useCallback(async () => {
-    if (view !== 'list' && view !== 'board') { setTasks([]); return; }
+    if (!shouldLoadTasks(view, planId)) { setTasks([]); return; }
     try {
       const loaded = await api.tasks(planId || undefined);
-      setTasks(loaded.filter((task) => !task.archivedAt)); setError('');
+      const active = loaded.filter((task) => !task.archivedAt);
+      setTasks(active);
+      setSelectedTask((current) => current ? active.find((task) => task.id === current.id) ?? current : current);
+      setError('');
     }
     catch (cause) { setError(message(cause)); }
   }, [planId, view]);
@@ -62,7 +65,12 @@ function TaskdroidApp() {
   const dashboardPlans = plans.filter((item) => includesStatus(filters.planStatusIds, item.statusId) && fuzzyMatch(filters.search.trim().toLowerCase(), [item.title, item.summary, item.sourcePlan]));
   const dashboardProgress = aggregateProgress(dashboardPlans);
 
-  async function refresh() { await Promise.all([loadProject(), loadTasks()]); }
+  const refresh = useCallback(async () => { await Promise.all([loadProject(), loadTasks()]); }, [loadProject, loadTasks]);
+  useEffect(() => {
+    const events = new EventSource('/api/events');
+    events.addEventListener('refresh', () => { void refresh(); });
+    return () => events.close();
+  }, [refresh]);
   function openTask(task: Task, subtaskId?: string) { setSelectedTask(task); setSelectedSubtaskId(subtaskId); }
   function closeTask() { setSelectedTask(undefined); setSelectedSubtaskId(undefined); }
   function openPlan(id: string) { closeTask(); setPlanId(id); setEditingPlan(true); }
@@ -104,6 +112,10 @@ function message(cause: unknown): string {
 }
 
 function includesStatus(statusIds: string[] | null, statusId: string) { return statusIds === null || statusIds.includes(statusId); }
+
+export function shouldLoadTasks(view: 'board' | 'list' | 'plans' | 'settings' | 'documentation', planId: string) {
+  return view === 'board' || view === 'list' || (view === 'plans' && Boolean(planId));
+}
 
 function filterTasks(tasks: Task[], filters: WorkFilterValues): Task[] {
   const query = filters.search.trim().toLowerCase();

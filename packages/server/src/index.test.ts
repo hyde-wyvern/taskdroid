@@ -1,4 +1,6 @@
 import { mkdtemp, rm } from 'node:fs/promises';
+import { once } from 'node:events';
+import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import request from 'supertest';
@@ -22,5 +24,29 @@ describe('HTTP API', () => {
       const conflict = await request(server).patch(`/api/tasks/${task.id}`).send({ expectedRevision: task.revision, changes: { title: 'Stale' } }).expect(409);
       expect(conflict.body.error.code).toBe('REVISION_CONFLICT');
     } finally { server.close(); }
+  });
+
+  it('emits a refresh event when Taskdroid data changes', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'taskdroid-events-')); roots.push(root);
+    const service = await TaskdroidService.initialize(root, 'Events');
+    const server = createApp(service).listen(0, '127.0.0.1');
+    await once(server, 'listening');
+    const { port } = server.address() as AddressInfo;
+    const response = await fetch(`http://127.0.0.1:${port}/api/events`);
+    const reader = response.body?.getReader();
+    if (!reader) throw new Error('Event stream missing response body');
+    try {
+      expect(response.headers.get('content-type')).toContain('text/event-stream');
+      await reader.read();
+      await service.createPlan({ title: 'Changed on disk' });
+      const event = await Promise.race([
+        reader.read().then(({ value }) => new TextDecoder().decode(value)),
+        new Promise<string>((_, reject) => setTimeout(() => reject(new Error('Timed out waiting for refresh event')), 1_000)),
+      ]);
+      expect(event).toContain('event: refresh');
+    } finally {
+      await reader.cancel();
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+    }
   });
 });

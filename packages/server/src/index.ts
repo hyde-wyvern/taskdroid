@@ -1,10 +1,38 @@
 import express, { type ErrorRequestHandler } from 'express';
+import { watch } from 'node:fs';
 import { join } from 'node:path';
 import { TaskdroidError, TaskdroidService } from '@taskdroid/core';
 
 export function createApp(service: TaskdroidService, webRoot?: string) {
   const app = express();
+  const refreshClients = new Set<express.Response>();
+  let refreshTimer: NodeJS.Timeout | undefined;
+  const publishRefresh = () => {
+    refreshTimer = undefined;
+    for (const response of refreshClients) response.write('event: refresh\ndata: {}\n\n');
+  };
+  const scheduleRefresh = (_event: string, filename: string | Buffer | null) => {
+    if (filename && !/\.(json|md)$/.test(String(filename))) return;
+    if (refreshTimer) clearTimeout(refreshTimer);
+    refreshTimer = setTimeout(publishRefresh, 50);
+  };
+  for (const directory of ['', 'plans', 'tasks', 'archive', 'archive/plans', 'archive/tasks', 'docs']) {
+    const watcher = watch(join(service.store.dataDir, directory), { persistent: false }, scheduleRefresh);
+    watcher.on('error', (error) => console.error(`Taskdroid refresh watcher failed: ${error.message}`));
+  }
   app.use(express.json({ limit: '1mb' }));
+
+  app.get('/api/events', (request, response) => {
+    response.status(200).set({
+      'cache-control': 'no-cache',
+      connection: 'keep-alive',
+      'content-type': 'text/event-stream',
+    });
+    response.flushHeaders();
+    response.write('retry: 1000\n\n');
+    refreshClients.add(response);
+    request.on('close', () => refreshClients.delete(response));
+  });
 
   app.get('/api/project', asyncRoute(async (_request, response) => response.json(await service.getProject())));
   app.put('/api/project/documents', asyncRoute(async (request, response) => response.json(await service.updateProjectDocuments(request.body.expectedRevision, request.body.documents))));

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api } from './api';
 import { EffortSelect } from './EffortSelect';
 import { IssueKey } from './IssueKey';
@@ -25,6 +25,7 @@ export function TaskEditor({ task: initial, planKey, initialSubtaskId, workflow,
   const [newSubtasks, setNewSubtasks] = useState<NewSubtask[]>([]);
   const [selectedSubtaskId, setSelectedSubtaskId] = useState<string | undefined>(initialSubtaskId);
   const toast = useToast();
+  useEffect(() => { if (!editing) setTask(initial); }, [editing, initial]);
   const activeSubtasks = sortByWorkPriority(task.subtasks.filter((item) => !item.archivedAt), workflow);
   const archivedSubtasks = sortNewest(task.subtasks.filter((item) => item.archivedAt));
   const progress = taskProgress(task, workflow);
