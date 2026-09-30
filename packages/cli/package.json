@@ -1,0 +1,14 @@
+{
+  "name": "@taskdroid/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": { "taskdroid": "dist/index.js" },
+  "scripts": { "build": "tsc -b", "typecheck": "tsc -b --pretty false" },
+  "dependencies": {
+    "@taskdroid/core": "0.1.0",
+    "@taskdroid/mcp": "0.1.0",
+    "@taskdroid/server": "0.1.0",
+    "commander": "^14.0.1",
+    "open": "^10.2.0"
+  }
+}

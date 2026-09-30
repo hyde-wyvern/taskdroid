@@ -1,0 +1,11 @@
+{
+  "name": "@taskdroid/server",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": "./dist/index.js",
+  "scripts": { "build": "tsc -b", "typecheck": "tsc -b --pretty false" },
+  "dependencies": { "@taskdroid/core": "0.1.0", "express": "^5.1.0" },
+  "devDependencies": { "@types/express": "^5.0.3", "supertest": "^7.1.4", "@types/supertest": "^6.0.3" }
+}
