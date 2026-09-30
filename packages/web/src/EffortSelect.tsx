@@ -15,7 +15,7 @@ export function EffortSelect({
 }) {
   return (
     <NativeSelect
-      classNames={{ input: "select-arrow effort-select" }}
+      classNames={{ input: "effort-select" }}
       aria-label={label}
       data={EFFORT_OPTIONS.map((effort) => ({
         value: String(effort),

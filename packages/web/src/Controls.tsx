@@ -6,11 +6,18 @@ import {
   Tooltip,
   type ButtonProps,
 } from "@mantine/core";
-import type { ButtonHTMLAttributes, MouseEventHandler, ReactNode } from "react";
+import type {
+  ButtonHTMLAttributes,
+  DragEventHandler,
+  MouseEventHandler,
+  ReactNode,
+} from "react";
 
 type TaskButtonProps = Omit<ButtonProps, "variant"> & {
   variant?: "default" | "primary" | "danger";
   onClick?: MouseEventHandler<HTMLButtonElement>;
+  onDragStart?: DragEventHandler<HTMLButtonElement>;
+  draggable?: boolean;
   type?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
 };
 

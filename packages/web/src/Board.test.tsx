@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Board } from "./Board";
+import { api } from "./api";
 import type { Task, Workflow } from "./types";
 import { renderWithMantine } from "./testUtils";
 
@@ -50,7 +51,7 @@ afterEach(cleanup);
 
 describe("Board", () => {
   it("renders workflow columns, task effort, and subtask count", () => {
-    render(
+    renderWithMantine(
       <Board
         planId="plan"
         workflow={workflow}
@@ -101,5 +102,32 @@ describe("Board", () => {
       "89",
       "100",
     ]);
+  });
+
+  it("preserves task selection and drag-and-drop status changes", async () => {
+    const onSelect = vi.fn();
+    const onChanged = vi.fn().mockResolvedValue(undefined);
+    const move = vi
+      .spyOn(api, "move")
+      .mockResolvedValue({ ...task, statusId: "closed", revision: 2 });
+    renderWithMantine(
+      <Board
+        planId="plan"
+        workflow={workflow}
+        tasks={[task]}
+        onSelect={onSelect}
+        onChanged={onChanged}
+        onError={vi.fn()}
+      />,
+    );
+    const card = screen.getByRole("button", { name: /Build board/ });
+    fireEvent.click(card);
+    expect(onSelect).toHaveBeenCalledWith(task);
+    const dataTransfer = { setData: vi.fn(), getData: vi.fn(() => task.id) };
+    fireEvent.dragStart(card, { dataTransfer });
+    expect(dataTransfer.setData).toHaveBeenCalledWith("text/task-id", task.id);
+    fireEvent.drop(document.querySelectorAll(".column")[1], { dataTransfer });
+    await vi.waitFor(() => expect(move).toHaveBeenCalledWith(task, "closed"));
+    expect(onChanged).toHaveBeenCalledOnce();
   });
 });

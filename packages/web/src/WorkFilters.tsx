@@ -48,7 +48,7 @@ export function WorkFilters({
         />
         {!projectOnly && (
           <NativeSelect
-            classNames={{ input: "select-arrow plan-filter" }}
+            classNames={{ input: "plan-filter" }}
             data={[
               { value: "", label: "All plans" },
               ...plans.map((item) => ({ value: item.id, label: item.title })),

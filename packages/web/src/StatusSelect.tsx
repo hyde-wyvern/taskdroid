@@ -23,7 +23,7 @@ export function StatusSelect({
     <NativeSelect
       id={id}
       classNames={{
-        input: `select-arrow status-select${compact ? " compact" : ""}`,
+        input: `status-select${compact ? " compact" : ""}`,
       }}
       styles={{ input: { borderColor: color } }}
       aria-label={label}
