@@ -36,7 +36,7 @@ button:disabled {
   display: inline-flex;
   align-items: center;
   margin-right: 7px;
-  color: #778196;
+  color: var(--taskdroid-text-subtle);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -80,8 +80,8 @@ button:disabled {
 }
 header {
   height: 64px;
-  background: #fff;
-  border-bottom: 1px solid #dfe3ea;
+  background: var(--taskdroid-surface-raised);
+  border-bottom: 1px solid var(--taskdroid-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -152,7 +152,7 @@ main {
   flex: 1;
   height: 7px;
   overflow: hidden;
-  background: #dfe4ec;
+  background: var(--taskdroid-progress-track);
   border-radius: 10px;
 }
 .filter-progress > div span {
@@ -162,7 +162,7 @@ main {
   border-radius: inherit;
 }
 .filter-progress small {
-  color: #667086;
+  color: var(--taskdroid-text-muted);
   font-size: 11px;
   white-space: nowrap;
 }
@@ -209,7 +209,7 @@ main {
 .status-filter-select-all {
   border: 0;
   padding: 2px 4px;
-  color: var(--mantine-color-taskdroid-6);
+  color: var(--taskdroid-link);
   background: transparent;
   font-size: 12px;
 }
@@ -239,7 +239,7 @@ textarea {
   min-width: var(--column-width);
   max-width: var(--column-width);
   border-radius: 9px;
-  background: #e9edf3;
+  background: var(--taskdroid-surface-muted);
   padding: 10px;
 }
 .column h2 {
@@ -258,7 +258,7 @@ textarea {
 }
 .column h2 span {
   margin-left: auto;
-  color: #657086;
+  color: var(--taskdroid-text-muted);
 }
 .cards {
   display: grid;
@@ -274,7 +274,7 @@ textarea {
   padding: 12px;
   text-align: left;
   white-space: normal;
-  box-shadow: 0 1px 2px #1b29451a;
+  box-shadow: var(--taskdroid-shadow-card);
 }
 .card .mantine-Button-inner,
 .card .mantine-Button-label {
@@ -291,7 +291,7 @@ textarea {
   display: -webkit-box;
   overflow: hidden;
   overflow-wrap: anywhere;
-  color: #687287;
+  color: var(--taskdroid-text-muted);
   font-size: 13px;
   margin: 0 0 12px;
   -webkit-box-orient: vertical;
@@ -300,14 +300,14 @@ textarea {
 .card footer {
   display: flex;
   justify-content: space-between;
-  color: #7a8497;
+  color: var(--taskdroid-text-subtle);
   font-size: 11px;
 }
 .floating {
   position: fixed;
   right: 26px;
   bottom: 24px;
-  box-shadow: 0 4px 16px #1720332c;
+  box-shadow: var(--taskdroid-shadow-float);
 }
 .quick-create {
   position: fixed;
@@ -315,9 +315,10 @@ textarea {
   bottom: 24px;
   display: flex;
   gap: 8px;
-  background: #fff;
+  background: var(--taskdroid-surface-raised);
+  border: 1px solid var(--taskdroid-border);
   padding: 12px;
-  box-shadow: 0 6px 28px #17203333;
+  box-shadow: var(--taskdroid-shadow-float);
   border-radius: 9px;
 }
 .effort-select {
@@ -328,8 +329,8 @@ textarea {
 }
 .error {
   margin: 12px 24px 0;
-  background: #ffeaeb;
-  color: #9f2028;
+  background: var(--taskdroid-error-surface);
+  color: var(--taskdroid-error-text);
   padding: 10px 14px;
   border-radius: 7px;
   display: flex;
@@ -352,12 +353,12 @@ textarea {
 }
 .toast {
   margin: 0;
-  box-shadow: 0 8px 24px #17203340;
+  box-shadow: var(--taskdroid-shadow-float);
 }
 .empty {
   text-align: center;
   padding: 100px;
-  color: #687287;
+  color: var(--taskdroid-text-muted);
 }
 .dialog {
   width: min(630px, 95vw);
@@ -367,7 +368,7 @@ textarea {
   color: var(--taskdroid-text);
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 20px 60px #0005;
+  box-shadow: var(--taskdroid-shadow-dialog);
 }
 .dialog.wide {
   width: min(900px, 95vw);
@@ -412,7 +413,7 @@ textarea {
 .detail-header .breadcrumbs button {
   border: 0;
   padding: 0;
-  color: #2f64d6;
+  color: var(--taskdroid-link);
   background: transparent;
   font-size: inherit;
   font-weight: inherit;
@@ -430,7 +431,7 @@ textarea {
   justify-content: space-between;
 }
 .dialog h3 small {
-  color: #687287;
+  color: var(--taskdroid-text-muted);
   font-weight: 400;
 }
 .dialog .mantine-Modal-body:has(.form-grid) {
@@ -486,15 +487,16 @@ textarea {
   min-width: 0;
 }
 .subtask.muted {
-  color: #7a8497;
+  color: var(--taskdroid-text-subtle);
   padding: 7px 10px;
-  background: #f2f4f7;
+  background: var(--taskdroid-surface-muted);
   border-radius: 6px;
 }
 .settings {
   max-width: 850px;
   margin: 20px auto;
-  background: #fff;
+  background: var(--taskdroid-surface-raised);
+  border: 1px solid var(--taskdroid-border);
   padding: 24px;
   border-radius: 10px;
 }
@@ -518,12 +520,12 @@ textarea {
 .documentation-header p,
 .documentation section > p,
 .documentation dd {
-  color: #687287;
+  color: var(--taskdroid-text-muted);
 }
 .documentation section {
   padding: 20px;
-  background: #fff;
-  border: 1px solid #dfe3ea;
+  background: var(--taskdroid-surface-raised);
+  border: 1px solid var(--taskdroid-border);
   border-radius: 10px;
 }
 .documentation h3 {
@@ -557,7 +559,8 @@ textarea {
   margin: 0;
   padding: 13px;
   overflow: auto;
-  background: #f4f6f9;
+  color: var(--taskdroid-text);
+  background: var(--taskdroid-surface-inset);
   border-radius: 7px;
   font:
     13px/1.55 ui-monospace,
@@ -565,20 +568,21 @@ textarea {
 }
 .documentation :not(pre) > code {
   padding: 2px 4px;
-  background: #f0f3f8;
+  color: var(--taskdroid-text);
+  background: var(--taskdroid-surface-muted);
   border-radius: 4px;
   font:
     0.92em ui-monospace,
     monospace;
 }
 .documentation-tools code {
-  color: #556077;
+  color: var(--taskdroid-text-muted);
   font:
     12px/1.5 ui-monospace,
     monospace;
 }
 .settings p {
-  color: #687287;
+  color: var(--taskdroid-text-muted);
 }
 .settings > label select {
   width: 260px;
@@ -616,7 +620,7 @@ textarea {
 }
 .view-heading p {
   margin: 0;
-  color: #687287;
+  color: var(--taskdroid-text-muted);
 }
 .backlog-view,
 .plans-view {
@@ -638,9 +642,9 @@ textarea {
   white-space: nowrap;
 }
 .document-tabs button.active {
-  color: #2f64d6;
-  border-color: #2f64d6;
-  background: #eef3ff;
+  color: var(--taskdroid-link);
+  border-color: var(--taskdroid-link);
+  background: var(--taskdroid-selected-surface);
 }
 .document-tabs .add-tab {
   min-width: 38px;
@@ -652,8 +656,8 @@ textarea {
   min-height: 180px;
   margin-bottom: 24px;
   padding: 14px;
-  background: #fff;
-  border: 1px solid #dfe3ea;
+  background: var(--taskdroid-surface-raised);
+  border: 1px solid var(--taskdroid-border);
   border-radius: 8px;
 }
 .project-document pre {
@@ -709,7 +713,7 @@ textarea {
   font-size: 16px;
 }
 .backlog-plan > header > span {
-  color: #687287;
+  color: var(--taskdroid-text-muted);
   font-size: 12px;
 }
 .backlog-plan > header > div {
@@ -743,14 +747,14 @@ textarea {
   justify-content: flex-start;
 }
 .plan-link:hover {
-  color: #2f64d6;
+  color: var(--taskdroid-link);
   background: transparent;
 }
 .backlog-tasks {
   display: grid;
 }
 .backlog-task + .backlog-task {
-  border-top: 1px solid #e6e9ef;
+  border-top: 1px solid var(--taskdroid-border-subtle);
 }
 .backlog-task-row {
   display: grid;
@@ -760,7 +764,7 @@ textarea {
   padding: 11px 16px;
 }
 .backlog-task-row > span {
-  color: #687287;
+  color: var(--taskdroid-text-muted);
   font-size: 12px;
 }
 .expand-button {
@@ -779,7 +783,7 @@ textarea {
   font-weight: 650;
 }
 .task-link:hover {
-  color: #2f64d6;
+  color: var(--taskdroid-link);
   background: transparent;
 }
 .backlog-subtasks {
@@ -809,7 +813,7 @@ textarea {
   white-space: normal;
 }
 .backlog-subtasks > div:not(.backlog-create) button:hover {
-  color: #2f64d6;
+  color: var(--taskdroid-link);
   background: transparent;
 }
 .new-row {
@@ -823,10 +827,10 @@ textarea {
   font-weight: 650;
 }
 .new-row:hover {
-  background: #f4f7fd;
+  background: var(--taskdroid-surface-hover);
 }
 .plan-new-row {
-  border-top: 1px solid #e6e9ef;
+  border-top: 1px solid var(--taskdroid-border-subtle);
 }
 .backlog-subtasks > .new-row {
   padding-left: 10px;
@@ -840,7 +844,7 @@ textarea {
 .empty-plan {
   margin: 0;
   padding: 18px 16px;
-  color: #7a8497;
+  color: var(--taskdroid-text-subtle);
   font-size: 13px;
 }
 .empty.compact {
@@ -853,14 +857,14 @@ textarea {
 }
 .plan-card {
   padding: 17px;
-  background: #fff;
-  border: 1px solid #dfe3ea;
+  background: var(--taskdroid-surface-raised);
+  border: 1px solid var(--taskdroid-border);
   border-radius: 10px;
-  box-shadow: 0 1px 2px #1b29450f;
+  box-shadow: var(--taskdroid-shadow-card);
 }
 .plan-card.archived {
   opacity: 0.55;
-  background: #f1f3f6;
+  background: var(--taskdroid-surface-muted);
   filter: grayscale(0.35);
 }
 .plan-card-heading {
@@ -878,7 +882,7 @@ textarea {
 }
 .plan-card > p {
   min-height: 38px;
-  color: #687287;
+  color: var(--taskdroid-text-muted);
   font-size: 13px;
 }
 .plan-card-progress > div:first-child {
@@ -887,7 +891,7 @@ textarea {
   margin-bottom: 7px;
 }
 .plan-card-progress small {
-  color: #687287;
+  color: var(--taskdroid-text-muted);
 }
 .plan-card-progress .taskdroid-progress-track {
   flex: 1;
@@ -936,7 +940,7 @@ textarea {
   font-weight: 650;
 }
 .plan-progress-heading small {
-  color: #687287;
+  color: var(--taskdroid-text-muted);
 }
 .viewer-status {
   display: flex;
@@ -1010,7 +1014,7 @@ textarea {
   gap: 10px;
   align-items: center;
   padding: 9px 11px;
-  background: #f4f6f9;
+  background: var(--taskdroid-surface-muted);
   border-radius: 6px;
 }
 .subtask-link {
@@ -1021,7 +1025,7 @@ textarea {
   font-weight: 650;
 }
 .subtask-link:hover {
-  color: #2f64d6;
+  color: var(--taskdroid-link);
   background: transparent;
 }
 @media (max-width: 900px) {
