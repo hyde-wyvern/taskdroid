@@ -3,6 +3,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Board } from './Board';
 import type { Task, Workflow } from './types';
+import { renderWithMantine } from './testUtils';
 
 const workflow: Workflow = {
   schemaVersion: 1, revision: 1, updatedAt: new Date().toISOString(), startStatusId: 'todo',
@@ -28,7 +29,7 @@ describe('Board', () => {
   });
 
   it('opens quick task creation form', () => {
-    render(<Board planId="plan" workflow={workflow} tasks={[task]} onSelect={vi.fn()} onChanged={vi.fn()} onError={vi.fn()} />);
+    renderWithMantine(<Board planId="plan" workflow={workflow} tasks={[task]} onSelect={vi.fn()} onChanged={vi.fn()} onError={vi.fn()} />);
     fireEvent.click(screen.getByText('+ Task'));
     expect(screen.getByPlaceholderText('Task title')).toBeTruthy();
     expect(Array.from(screen.getByRole('combobox', { name: 'Task effort points' }).querySelectorAll('option')).map((option) => option.value)).toEqual(['0', '1', '2', '3', '5', '8', '13', '21', '34', '55', '89', '100']);

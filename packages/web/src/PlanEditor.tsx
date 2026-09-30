@@ -6,6 +6,7 @@ import { DetailHeader } from './DetailHeader';
 import { WorkItemViewer } from './WorkItemViewer';
 import { useToast } from './Toasts';
 import { EffortSelect } from './EffortSelect';
+import { DialogShell } from './Controls';
 import { isClosed } from './isClosed';
 import { sortByWorkPriority, sortNewest } from './sortNewest';
 import type { Plan, Task, Workflow } from './types';
@@ -102,7 +103,7 @@ export function PlanEditor({ plan: initial, tasks = [], workflow, archived, onSe
     onEdit={archived ? undefined : startEditing}
     onClose={onClose}
   />;
-  return <div className="overlay" onMouseDown={onClose}><section className="dialog wide" onMouseDown={(event) => event.stopPropagation()}>
+  return <DialogShell title={plan ? 'Edit plan' : 'New plan'} onClose={onClose} wide>
     <DetailHeader title={plan ? 'Edit plan' : 'New plan'} crumbs={plan ? [{ key: plan.key, kind: 'plan' }] : []} onClose={onClose} />
     <>
       <div className="form-grid">
@@ -130,5 +131,5 @@ export function PlanEditor({ plan: initial, tasks = [], workflow, archived, onSe
       <button onClick={plan ? () => setEditing(false) : onClose}>{plan ? 'Cancel' : 'Close'}</button>
       {!archived && <button className="primary" disabled={!title.trim()} onClick={() => void save()}>Save</button>}
     </footer>
-  </section></div>;
+  </DialogShell>;
 }

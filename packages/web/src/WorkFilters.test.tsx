@@ -1,9 +1,10 @@
 import type { Plan, Workflow } from "./types";
 import { afterEach, describe, expect, it, vi } from "vitest";
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, screen } from "@testing-library/react";
 
 import { WorkFilters } from "./WorkFilters";
+import { renderWithMantine } from "./testUtils";
 
 afterEach(cleanup);
 const plan: Plan = {
@@ -49,7 +50,7 @@ const allStatuses = {
 describe("WorkFilters", () => {
   it("shows plain plan titles, progress, and updates work filters", () => {
     const onChange = vi.fn();
-    render(
+    renderWithMantine(
       <WorkFilters
         plans={[plan]}
         planId="plan"
@@ -83,7 +84,7 @@ describe("WorkFilters", () => {
 
   it("shows supplied visible-work progress and clears all filters", () => {
     const onClear = vi.fn();
-    render(
+    renderWithMantine(
       <WorkFilters
         plans={[plan]}
         planId=""

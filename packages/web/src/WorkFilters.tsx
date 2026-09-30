@@ -1,4 +1,5 @@
 import type { Plan, Progress, Workflow } from "./types";
+import { ProgressBar } from "./Controls";
 
 type StatusSelection = string[] | null;
 export type WorkFilterValues = {
@@ -68,15 +69,7 @@ export function WorkFilters({
         </button>
       </div>
       <div className="filter-progress">
-        <div
-          role="progressbar"
-          aria-label="Visible work progress"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={progress.percentage}
-        >
-          <span style={{ width: `${progress.percentage}%` }} />
-        </div>
+        <ProgressBar className="filter-progress-bar" size={8} value={progress.percentage} label="Visible work progress" />
         <small>
           {progress.percentage}% - {progress.completedEffort}/
           {progress.totalEffort} points

@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ListView } from './ListView';
 import { PlansView } from './PlansView';
 import type { Plan, Task, Workflow } from './types';
+import { renderWithMantine } from './testUtils';
 
 afterEach(cleanup);
 const workflow: Workflow = { schemaVersion: 1, revision: 1, updatedAt: new Date().toISOString(), startStatusId: 'todo', statuses: [
@@ -19,7 +20,7 @@ const task: Task = { id: 'task', planId: 'plan', revision: 1, title: 'Queued wor
 describe('project views', () => {
   it('shows plans with status and weighted progress', () => {
     const archivedPlan = { ...plan, id: 'archived', title: 'Archived platform', statusId: 'closed', archivedAt: new Date().toISOString() };
-    render(<PlansView plans={[plan, archivedPlan]} workflow={workflow} onSelect={vi.fn()} onMove={vi.fn()} onCreate={vi.fn()} />);
+    renderWithMantine(<PlansView plans={[plan, archivedPlan]} workflow={workflow} onSelect={vi.fn()} onMove={vi.fn()} onCreate={vi.fn()} />);
     expect(screen.getByRole('button', { name: 'Platform' })).toBeTruthy();
     expect(screen.getByRole('combobox', { name: 'Platform status' })).toHaveProperty('value', 'todo');
     expect(screen.getByRole('progressbar', { name: 'Platform progress' }).getAttribute('aria-valuenow')).toBe('20');
@@ -34,7 +35,7 @@ describe('project views', () => {
     const onSelectTask = vi.fn();
     const onSelectSubtask = vi.fn();
     const activeTask = { ...task, id: 'active', title: 'Active work', statusId: 'todo', subtasks: [] };
-    render(<ListView plans={[plan, secondPlan]} tasks={[task, activeTask]} workflow={workflow} onSelectPlan={onSelectPlan} onSelectTask={onSelectTask} onSelectSubtask={onSelectSubtask} onChanged={vi.fn()} onError={vi.fn()} />);
+    renderWithMantine(<ListView plans={[plan, secondPlan]} tasks={[task, activeTask]} workflow={workflow} onSelectPlan={onSelectPlan} onSelectTask={onSelectTask} onSelectSubtask={onSelectSubtask} onChanged={vi.fn()} onError={vi.fn()} />);
     expect(screen.getByRole('heading', { name: 'Platform' })).toBeTruthy();
     expect(screen.getByRole('heading', { name: 'Mobile' })).toBeTruthy();
     expect(screen.getByText('Queued work')).toBeTruthy();

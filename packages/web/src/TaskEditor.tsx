@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from './api';
 import { EffortSelect } from './EffortSelect';
+import { DialogShell } from './Controls';
 import { IssueKey } from './IssueKey';
 import { DetailHeader } from './DetailHeader';
 import { WorkItemViewer } from './WorkItemViewer';
@@ -82,7 +83,7 @@ export function TaskEditor({ task: initial, planKey, initialSubtaskId, workflow,
     onClose={onClose}
   />;
 
-  return <div className="overlay" onMouseDown={onClose}><section className="dialog wide" onMouseDown={(event) => event.stopPropagation()}>
+  return <DialogShell title="Edit task" onClose={onClose} wide>
     <DetailHeader title="Edit task" crumbs={[{ key: planKey, kind: 'plan', onSelect: onSelectPlan }, { key: task.key, kind: 'task' }]} onClose={onClose} />
     <>
     <div className="form-grid">
@@ -116,7 +117,7 @@ export function TaskEditor({ task: initial, planKey, initialSubtaskId, workflow,
       <button onClick={() => setEditing(false)}>Cancel</button>
       <button className="primary" onClick={() => void save()}>Save</button>
     </footer>
-  </section></div>;
+  </DialogShell>;
 }
 
 function taskProgress(task: Task, workflow: Workflow) {

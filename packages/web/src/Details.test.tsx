@@ -1,10 +1,11 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { api } from './api';
 import { PlanEditor } from './PlanEditor';
 import { TaskEditor } from './TaskEditor';
 import type { Plan, Task, Workflow } from './types';
+import { renderWithMantine } from './testUtils';
 
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 const now = new Date().toISOString();
@@ -23,7 +24,7 @@ describe('detail dialogs', () => {
   it('opens plan read-only and enables fields only after Edit', async () => {
     const onSelectTask = vi.fn();
     vi.spyOn(api, 'tasks').mockResolvedValue([{ ...task, id: 'archived-task', title: 'Archived task', archivedAt: now }]);
-    render(<PlanEditor plan={plan} tasks={[task]} workflow={workflow} archived={false} onSelectTask={onSelectTask} onClose={vi.fn()} onSaved={vi.fn()} onError={vi.fn()} />);
+    renderWithMantine(<PlanEditor plan={plan} tasks={[task]} workflow={workflow} archived={false} onSelectTask={onSelectTask} onClose={vi.fn()} onSaved={vi.fn()} onError={vi.fn()} />);
     expect(screen.getByRole('heading', { name: 'Viewer plan' })).toBeTruthy();
     expect(screen.getByRole('heading', { name: 'Viewer plan' }).closest('.dialog')?.classList.contains('wide')).toBe(true);
     expect(screen.queryByText('Plan details')).toBeNull();
@@ -39,7 +40,7 @@ describe('detail dialogs', () => {
     expect(screen.queryByDisplayValue('Viewer plan')).toBeNull();
     fireEvent.click(screen.getByText('Edit'));
     expect(screen.getByDisplayValue('Viewer plan')).toBeTruthy();
-    expect(screen.getByText('Edit plan')).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Edit plan' })).toBeTruthy();
     expect(screen.getByDisplayValue('Viewer task')).toBeTruthy();
     expect(screen.getByRole('combobox', { name: 'Viewer task status' })).toHaveProperty('value', 'todo');
     expect(screen.getByRole('button', { name: 'Archive Viewer task' })).toBeTruthy();
@@ -51,7 +52,7 @@ describe('detail dialogs', () => {
   });
 
   it('opens task read-only and enables fields only after Edit', () => {
-    render(<TaskEditor task={task} planKey="EP-1" workflow={workflow} archived={false} onSelectPlan={vi.fn()} onClose={vi.fn()} onSaved={vi.fn()} onError={vi.fn()} />);
+    renderWithMantine(<TaskEditor task={task} planKey="EP-1" workflow={workflow} archived={false} onSelectPlan={vi.fn()} onClose={vi.fn()} onSaved={vi.fn()} onError={vi.fn()} />);
     expect(screen.getByRole('heading', { name: 'Viewer task' })).toBeTruthy();
     expect(screen.queryByText('Task details')).toBeNull();
     expect(screen.getByRole('combobox', { name: 'Task status' })).toHaveProperty('value', 'todo');
@@ -63,18 +64,18 @@ describe('detail dialogs', () => {
     expect(screen.queryByDisplayValue('Viewer task')).toBeNull();
     fireEvent.click(screen.getByText('Edit'));
     expect(screen.getByDisplayValue('Viewer task')).toBeTruthy();
-    expect(screen.getByText('Edit task')).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Edit task' })).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: '+ New subtask' }));
     expect(Array.from(screen.getByRole('combobox', { name: 'New subtask effort points' }).querySelectorAll('option')).map((option) => option.value)).toEqual(['0', '1', '2', '3', '5', '8', '13', '21', '34', '55', '89', '100']);
   });
 
   it('opens subtask viewer and editor from task details', () => {
     const onSelectPlan = vi.fn();
-    render(<TaskEditor task={{ ...task, key: 'EP-2', subtasks: task.subtasks.map((item, index) => ({ ...item, key: `EP-${index + 3}` })) }} planKey="EP-1" workflow={workflow} archived={false} onSelectPlan={onSelectPlan} onClose={vi.fn()} onSaved={vi.fn()} onError={vi.fn()} />);
+    renderWithMantine(<TaskEditor task={{ ...task, key: 'EP-2', subtasks: task.subtasks.map((item, index) => ({ ...item, key: `EP-${index + 3}` })) }} planKey="EP-1" workflow={workflow} archived={false} onSelectPlan={onSelectPlan} onClose={vi.fn()} onSaved={vi.fn()} onError={vi.fn()} />);
     fireEvent.click(screen.getByRole('button', { name: 'Done work' }));
     expect(screen.getByRole('heading', { name: 'Done work' })).toBeTruthy();
     expect(screen.queryByRole('heading', { name: 'Viewer task' })).toBeNull();
-    expect(document.querySelectorAll('.overlay')).toHaveLength(1);
+    expect(screen.getAllByRole('dialog')).toHaveLength(1);
     expect(screen.getByRole('button', { name: 'Open EP-1' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Open EP-2' })).toBeTruthy();
     expect(screen.getByRole('heading', { name: 'Done work' }).closest('.dialog')?.classList.contains('wide')).toBe(true);
@@ -91,7 +92,7 @@ describe('detail dialogs', () => {
 
   it('keeps task edit changes local until Save, then returns to the viewer', async () => {
     const updateTask = vi.spyOn(api, 'updateTask').mockResolvedValue({ ...task, statusId: 'closed', revision: 2 });
-    render(<TaskEditor task={task} planKey="EP-1" workflow={workflow} archived={false} onSelectPlan={vi.fn()} onClose={vi.fn()} onSaved={vi.fn()} onError={vi.fn()} />);
+    renderWithMantine(<TaskEditor task={task} planKey="EP-1" workflow={workflow} archived={false} onSelectPlan={vi.fn()} onClose={vi.fn()} onSaved={vi.fn()} onError={vi.fn()} />);
     fireEvent.click(screen.getByText('Edit'));
     fireEvent.change(screen.getByRole('combobox', { name: 'Task status' }), { target: { value: 'closed' } });
     expect(updateTask).not.toHaveBeenCalled();

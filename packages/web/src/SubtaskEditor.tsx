@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { api } from './api';
 import { StatusSelect } from './StatusSelect';
+import { DialogShell } from './Controls';
 import { DetailHeader } from './DetailHeader';
 import { WorkItemViewer } from './WorkItemViewer';
 import { useToast } from './Toasts';
@@ -56,7 +57,7 @@ export function SubtaskEditor({ task, subtask: initial, planKey, workflow, archi
     onClose={onClose}
   />;
 
-  return <div className="overlay" onMouseDown={onClose}><section className="dialog wide" onMouseDown={(event) => event.stopPropagation()}>
+  return <DialogShell title="Edit subtask" onClose={onClose} wide>
     <DetailHeader title="Edit subtask" crumbs={[{ key: planKey, kind: 'plan', onSelect: onSelectPlan }, { key: task.key, kind: 'task', onSelect: onSelectTask }, { key: subtask.key, kind: 'subtask' }]} onClose={onClose} />
     <>
       <div className="form-grid">
@@ -73,5 +74,5 @@ export function SubtaskEditor({ task, subtask: initial, planKey, workflow, archi
       <button onClick={() => setEditing(false)}>Cancel</button>
       <button className="primary" disabled={!title.trim()} onClick={() => void save()}>Save</button>
     </footer>
-  </section></div>;
+  </DialogShell>;
 }

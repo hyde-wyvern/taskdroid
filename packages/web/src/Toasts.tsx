@@ -1,4 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { Notification } from '@mantine/core';
+import { IconCheck } from '@tabler/icons-react';
 
 type Toast = { id: number; message: string };
 const ToastContext = createContext<(message: string) => void>(() => undefined);
@@ -18,5 +20,15 @@ export function useToast() { return useContext(ToastContext); }
 
 function ToastMessage({ toast, onDismiss }: { toast: Toast; onDismiss: (id: number) => void }) {
   useEffect(() => { const timer = window.setTimeout(() => onDismiss(toast.id), 3500); return () => window.clearTimeout(timer); }, [onDismiss, toast.id]);
-  return <div className="toast" role="status"><span>✓</span>{toast.message}<button aria-label="Dismiss notification" onClick={() => onDismiss(toast.id)}>×</button></div>;
+  return <Notification
+    className="toast"
+    color="teal"
+    icon={<IconCheck size={18} />}
+    role="status"
+    withCloseButton
+    closeButtonProps={{ 'aria-label': 'Dismiss notification' }}
+    onClose={() => onDismiss(toast.id)}
+  >
+    {toast.message}
+  </Notification>;
 }
