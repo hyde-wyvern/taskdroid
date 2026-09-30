@@ -1,3 +1,4 @@
+import { Select, useMantineColorScheme } from '@mantine/core';
 import { useState } from 'react';
 import { api } from './api';
 import { useToast } from './Toasts';
@@ -8,6 +9,7 @@ export function Settings({ workflow, onSaved, onError }: { workflow: Workflow; o
   const [statuses, setStatuses] = useState(workflow.statuses);
   const [startStatusId, setStartStatusId] = useState(workflow.startStatusId);
   const [removed, setRemoved] = useState<string[]>([]);
+  const { colorScheme, setColorScheme } = useMantineColorScheme();
 
   function patch(id: string, changes: Partial<Status>) { setStatuses((items) => items.map((item) => item.id === id ? { ...item, ...changes } : item)); }
   function move(index: number, offset: number) {
@@ -28,6 +30,7 @@ export function Settings({ workflow, onSaved, onError }: { workflow: Workflow; o
   }
 
   return <section className="settings"><h2>Workflow settings</h2><p>Backlog and Closed stay fixed. Removed statuses move existing work to Backlog.</p>
+    <Select label="Color scheme" aria-label="Color scheme" value={colorScheme} data={[{ value: 'auto', label: 'System' }, { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]} onChange={(value) => { if (value === 'auto' || value === 'light' || value === 'dark') setColorScheme(value); }} />
     <label>Claimed tasks start in<select value={startStatusId} onChange={(event) => setStartStatusId(event.target.value)}>{statuses.filter((status) => !status.fixed).map((status) => <option key={status.id} value={status.id}>{status.name}</option>)}</select></label>
     <div className="status-list">{statuses.map((status, index) => <div className="status-row" key={status.id}>
       <input type="color" value={status.color} disabled={Boolean(status.fixed)} onChange={(event) => patch(status.id, { color: event.target.value })} />
