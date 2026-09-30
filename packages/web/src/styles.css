@@ -172,8 +172,17 @@ main {
 .search-filter {
   min-width: 0;
 }
-.status-filter { min-width: 0; }
-.status-filter-trigger { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; white-space: nowrap; }
+.status-filter {
+  min-width: 0;
+}
+.status-filter-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  white-space: nowrap;
+}
 .status-filter-menu {
   display: grid;
   gap: 10px;

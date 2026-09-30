@@ -129,35 +129,51 @@ function StatusFilter({
   const allCount = workflow.statuses.length * levels.length;
   return (
     <div className="status-filter">
-    <Popover width={220} position="bottom-end" shadow="md">
-      <Popover.Target>
-        <TaskButton type="button" className="status-filter-trigger" aria-label="Status filter">
-          <span>Status: {activeCount === allCount ? "All" : `${activeCount}/${allCount}`}</span>
-          <IconChevronDown aria-hidden="true" size={15} />
-        </TaskButton>
-      </Popover.Target>
-      <Popover.Dropdown className="status-filter-menu" aria-label="Status filter options">
-        {levels.map(({ label, key }) => (
-          <fieldset className="status-filter-group" key={key}>
-            <legend>
-              {label}
-              <TaskButton type="button" className="status-filter-select-all" onClick={() => selectAll(key)}>
-                All
-              </TaskButton>
-            </legend>
-            {workflow.statuses.map((status) => (
-              <Checkbox
-                key={status.id}
-                label={status.name}
-                checked={values[key] === null || values[key].includes(status.id)}
-                onChange={() => update(key, status.id)}
-                size="xs"
-              />
-            ))}
-          </fieldset>
-        ))}
-      </Popover.Dropdown>
-    </Popover>
+      <Popover width={220} position="bottom-end" shadow="md">
+        <Popover.Target>
+          <TaskButton
+            type="button"
+            className="status-filter-trigger"
+            aria-label="Status filter"
+          >
+            <span>
+              Status:{" "}
+              {activeCount === allCount ? "All" : `${activeCount}/${allCount}`}
+            </span>
+            <IconChevronDown aria-hidden="true" size={15} />
+          </TaskButton>
+        </Popover.Target>
+        <Popover.Dropdown
+          className="status-filter-menu"
+          aria-label="Status filter options"
+        >
+          {levels.map(({ label, key }) => (
+            <fieldset className="status-filter-group" key={key}>
+              <legend>
+                {label}
+                <TaskButton
+                  type="button"
+                  className="status-filter-select-all"
+                  onClick={() => selectAll(key)}
+                >
+                  All
+                </TaskButton>
+              </legend>
+              {workflow.statuses.map((status) => (
+                <Checkbox
+                  key={status.id}
+                  label={status.name}
+                  checked={
+                    values[key] === null || values[key].includes(status.id)
+                  }
+                  onChange={() => update(key, status.id)}
+                  size="xs"
+                />
+              ))}
+            </fieldset>
+          ))}
+        </Popover.Dropdown>
+      </Popover>
     </div>
   );
 }

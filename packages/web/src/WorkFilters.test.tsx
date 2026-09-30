@@ -75,7 +75,9 @@ describe("WorkFilters", () => {
     expect(onChange).toHaveBeenCalledWith({ ...allStatuses, search: "agent" });
     expect(screen.getByText("Status: All")).toBeTruthy();
     fireEvent.click(screen.getByText("Status: All"));
-    fireEvent.click((await screen.findAllByRole("checkbox", { name: "Todo" }))[0]);
+    fireEvent.click(
+      (await screen.findAllByRole("checkbox", { name: "Todo" }))[0],
+    );
     expect(onChange).toHaveBeenLastCalledWith({
       ...allStatuses,
       planStatusIds: ["backlog", "closed"],
