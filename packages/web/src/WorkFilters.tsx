@@ -1,5 +1,8 @@
 import type { Plan, Progress, Workflow } from "./types";
+import { Checkbox, NativeSelect, Popover, TextInput } from "@mantine/core";
+import { IconChevronDown } from "@tabler/icons-react";
 import { ProgressBar } from "./Controls";
+import { TaskButton } from "./Controls";
 
 type StatusSelection = string[] | null;
 export type WorkFilterValues = {
@@ -33,8 +36,8 @@ export function WorkFilters({
   return (
     <section className="work-filters" aria-label="Work filters">
       <div className="work-filter-controls">
-        <input
-          className="search-filter"
+        <TextInput
+          classNames={{ input: "search-filter" }}
           type="search"
           placeholder="Search work"
           aria-label="Search work"
@@ -44,19 +47,16 @@ export function WorkFilters({
           }
         />
         {!projectOnly && (
-          <select
-            className="select-arrow plan-filter"
+          <NativeSelect
+            classNames={{ input: "select-arrow plan-filter" }}
+            data={[
+              { value: "", label: "All plans" },
+              ...plans.map((item) => ({ value: item.id, label: item.title })),
+            ]}
             value={planId}
             onChange={(event) => onPlanChange(event.target.value)}
             aria-label="Plan filter"
-          >
-            <option value="">All plans</option>
-            {plans.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.title}
-              </option>
-            ))}
-          </select>
+          />
         )}
         <StatusFilter
           workflow={workflow}
@@ -64,9 +64,9 @@ export function WorkFilters({
           onChange={onChange}
           projectOnly={projectOnly}
         />
-        <button className="clear-filters" onClick={onClear}>
+        <TaskButton type="button" className="clear-filters" onClick={onClear}>
           Clear filters
-        </button>
+        </TaskButton>
       </div>
       <div className="filter-progress">
         <ProgressBar
@@ -128,35 +128,36 @@ function StatusFilter({
   );
   const allCount = workflow.statuses.length * levels.length;
   return (
-    <details className="status-filter">
-      <summary aria-label="Status filter">
-        Status:{" "}
-        {activeCount === allCount ? "All" : `${activeCount}/${allCount}`}
-      </summary>
-      <div className="status-filter-menu">
+    <div className="status-filter">
+    <Popover width={220} position="bottom-end" shadow="md">
+      <Popover.Target>
+        <TaskButton type="button" className="status-filter-trigger" aria-label="Status filter">
+          <span>Status: {activeCount === allCount ? "All" : `${activeCount}/${allCount}`}</span>
+          <IconChevronDown aria-hidden="true" size={15} />
+        </TaskButton>
+      </Popover.Target>
+      <Popover.Dropdown className="status-filter-menu" aria-label="Status filter options">
         {levels.map(({ label, key }) => (
-          <fieldset key={key}>
+          <fieldset className="status-filter-group" key={key}>
             <legend>
               {label}
-              <button type="button" onClick={() => selectAll(key)}>
+              <TaskButton type="button" className="status-filter-select-all" onClick={() => selectAll(key)}>
                 All
-              </button>
+              </TaskButton>
             </legend>
             {workflow.statuses.map((status) => (
-              <label key={status.id}>
-                <input
-                  type="checkbox"
-                  checked={
-                    values[key] === null || values[key].includes(status.id)
-                  }
-                  onChange={() => update(key, status.id)}
-                />
-                {status.name}
-              </label>
+              <Checkbox
+                key={status.id}
+                label={status.name}
+                checked={values[key] === null || values[key].includes(status.id)}
+                onChange={() => update(key, status.id)}
+                size="xs"
+              />
             ))}
           </fieldset>
         ))}
-      </div>
-    </details>
+      </Popover.Dropdown>
+    </Popover>
+    </div>
   );
 }

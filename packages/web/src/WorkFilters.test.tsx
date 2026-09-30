@@ -48,7 +48,7 @@ const allStatuses = {
 };
 
 describe("WorkFilters", () => {
-  it("shows plain plan titles, progress, and updates work filters", () => {
+  it("shows plain plan titles, progress, and updates work filters", async () => {
     const onChange = vi.fn();
     renderWithMantine(
       <WorkFilters
@@ -75,7 +75,7 @@ describe("WorkFilters", () => {
     expect(onChange).toHaveBeenCalledWith({ ...allStatuses, search: "agent" });
     expect(screen.getByText("Status: All")).toBeTruthy();
     fireEvent.click(screen.getByText("Status: All"));
-    fireEvent.click(screen.getAllByRole("checkbox", { name: "Todo" })[0]);
+    fireEvent.click((await screen.findAllByRole("checkbox", { name: "Todo" }))[0]);
     expect(onChange).toHaveBeenLastCalledWith({
       ...allStatuses,
       planStatusIds: ["backlog", "closed"],

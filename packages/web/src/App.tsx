@@ -11,6 +11,8 @@ import { WorkFilters, type WorkFilterValues } from './WorkFilters';
 import { fuzzyMatch } from './fuzzySearch';
 import { ToastProvider, useToast } from './Toasts';
 import { sortByWorkPriority } from './sortNewest';
+import { IconX } from '@tabler/icons-react';
+import { IconAction, TaskButton } from './Controls';
 import type { Plan, Progress, Project, Task, Workflow } from './types';
 
 export function App() {
@@ -79,15 +81,15 @@ function TaskdroidApp() {
   return <div className="shell">
     <header>
       <div><span className="logo">TD</span><h1>{project?.name ?? 'Taskdroid'}</h1></div>
-      <nav>
-        <button className={view === 'board' ? 'active' : ''} onClick={() => setView('board')}>Board</button>
-        <button className={view === 'list' ? 'active' : ''} onClick={() => setView('list')}>List</button>
-        <button className={view === 'plans' ? 'active' : ''} onClick={() => setView('plans')}>Project</button>
-        <button className={view === 'settings' ? 'active' : ''} onClick={() => setView('settings')}>Settings</button>
-        <button className={view === 'documentation' ? 'active' : ''} onClick={() => setView('documentation')}>Documentation</button>
+      <nav aria-label="Primary navigation">
+        <TaskButton type="button" variant={view === 'board' ? 'primary' : 'default'} className={view === 'board' ? 'active' : undefined} aria-pressed={view === 'board'} onClick={() => setView('board')}>Board</TaskButton>
+        <TaskButton type="button" variant={view === 'list' ? 'primary' : 'default'} className={view === 'list' ? 'active' : undefined} aria-pressed={view === 'list'} onClick={() => setView('list')}>List</TaskButton>
+        <TaskButton type="button" variant={view === 'plans' ? 'primary' : 'default'} className={view === 'plans' ? 'active' : undefined} aria-pressed={view === 'plans'} onClick={() => setView('plans')}>Project</TaskButton>
+        <TaskButton type="button" variant={view === 'settings' ? 'primary' : 'default'} className={view === 'settings' ? 'active' : undefined} aria-pressed={view === 'settings'} onClick={() => setView('settings')}>Settings</TaskButton>
+        <TaskButton type="button" variant={view === 'documentation' ? 'primary' : 'default'} className={view === 'documentation' ? 'active' : undefined} aria-pressed={view === 'documentation'} onClick={() => setView('documentation')}>Documentation</TaskButton>
       </nav>
     </header>
-    {error && <div className="error" role="alert">{error}<button onClick={() => setError('')}>×</button></div>}
+    {error && <div className="error" role="alert">{error}<IconAction label="Dismiss error" icon={<IconX size={16} />} onClick={() => setError('')} /></div>}
     <main>
       {view === 'documentation' ? <Documentation /> : view === 'settings' && project ? <Settings workflow={project.workflow} onSaved={loadProject} onError={(cause) => setError(message(cause))} /> : view === 'plans' && project ? <><WorkFilters plans={plans} planId="" workflow={project.workflow} progress={dashboardProgress} values={filters} onPlanChange={() => undefined} onChange={setFilters} onClear={clearFilters} projectOnly /><ProjectView project={project} plans={dashboardPlans} workflow={project.workflow} onSelect={(selected) => { setPlanId(selected.id); setEditingPlan(true); }} onCreate={() => { setPlanId(''); setEditingPlan(true); }} onMove={async (selected, statusId) => { try { await api.movePlan(selected, statusId); await loadProject(); toast('Plan status updated'); } catch (cause) { setError(message(cause)); } }} onSave={async (documents) => { await api.updateProjectDocuments(project, documents); await loadProject(); }} onError={(cause) => setError(message(cause))} /></> : view === 'list' && project ? <>
         <WorkFilters plans={plans} planId={planId} workflow={project.workflow} progress={visibleProgress} values={filters} onPlanChange={setPlanId} onChange={setFilters} onClear={clearFilters} />
@@ -103,7 +105,7 @@ function TaskdroidApp() {
 }
 
 function Empty({ create }: { create: () => void }) {
-  return <div className="empty"><h2>No plans yet</h2><button className="primary" onClick={create}>Create first plan</button></div>;
+  return <div className="empty"><h2>No plans yet</h2><TaskButton variant="primary" onClick={create}>Create first plan</TaskButton></div>;
 }
 
 function message(cause: unknown): string {

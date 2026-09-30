@@ -103,7 +103,7 @@ header nav button {
   height: 64px;
 }
 header nav button.active {
-  color: #2f64d6;
+  color: #fff;
   border-bottom: 3px solid #2f64d6;
 }
 .logo {
@@ -172,70 +172,37 @@ main {
 .search-filter {
   min-width: 0;
 }
-.status-filter {
-  position: relative;
-}
-.status-filter summary {
-  padding: 8px 10px;
-  border: 1px solid #cbd2dd;
-  border-radius: 6px;
-  background: #fff;
-  color: #273248;
-  cursor: pointer;
-  list-style: none;
-}
-.status-filter summary::-webkit-details-marker {
-  display: none;
-}
-.status-filter summary::after {
-  content: "⌄";
-  float: right;
-  margin-left: 8px;
-}
+.status-filter { min-width: 0; }
+.status-filter-trigger { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; white-space: nowrap; }
 .status-filter-menu {
-  position: absolute;
-  z-index: 5;
-  top: calc(100% + 6px);
-  right: 0;
   display: grid;
   gap: 10px;
-  width: 220px;
-  padding: 12px;
-  background: #fff;
-  border: 1px solid #dfe3ea;
-  border-radius: 8px;
-  box-shadow: 0 8px 24px #17203326;
+  max-height: min(70vh, 420px);
+  overflow-y: auto;
 }
-.status-filter fieldset {
+.status-filter-group {
   display: grid;
   gap: 5px;
   margin: 0;
   padding: 0;
   border: 0;
 }
-.status-filter legend {
+.status-filter-group legend {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
   padding: 0 0 3px;
-  color: #687287;
+  color: var(--taskdroid-text-muted);
   font-size: 12px;
   font-weight: 700;
 }
-.status-filter legend button {
-  float: right;
+.status-filter-select-all {
   border: 0;
-  padding: 0;
-  color: #2f64d6;
+  padding: 2px 4px;
+  color: var(--mantine-color-taskdroid-6);
   background: transparent;
   font-size: 12px;
-}
-.status-filter label {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 13px;
-}
-.status-filter input {
-  accent-color: #2f64d6;
 }
 select,
 input,
