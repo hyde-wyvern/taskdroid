@@ -35,8 +35,8 @@ const project: Project = {
   name: "Taskdroid test",
   workflow,
   documents: {
-    "description.md": "Project overview",
-    "agents.md": "Agent rules",
+    "description.md": "# Project overview\n\nA **local** project.",
+    "agents.md": "## Agent rules\n\nUse _clear_ rules.",
   },
   plans: [],
 };
@@ -65,7 +65,8 @@ describe("ProjectView documents", () => {
         .getByRole("tab", { name: "agents.md" })
         .getAttribute("aria-selected"),
     ).toBe("true");
-    expect(screen.getByText("Agent rules")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Agent rules" })).toBeTruthy();
+    expect(screen.getByText("clear").tagName).toBe("EM");
     fireEvent.click(screen.getByRole("button", { name: "Edit document" }));
     fireEvent.change(
       screen.getByRole("textbox", { name: "agents.md content" }),
@@ -75,21 +76,21 @@ describe("ProjectView documents", () => {
     );
     expect(onSave).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
-    expect(screen.getByText("Agent rules")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Agent rules" })).toBeTruthy();
     expect(onSave).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole("button", { name: "Edit document" }));
     fireEvent.change(
       screen.getByRole("textbox", { name: "agents.md content" }),
       {
-        target: { value: "Saved rules" },
+        target: { value: "# Saved rules" },
       },
     );
     fireEvent.click(screen.getByRole("button", { name: "Save documents" }));
     await waitFor(() =>
       expect(onSave).toHaveBeenCalledWith({
         ...project.documents,
-        "agents.md": "Saved rules",
+        "agents.md": "# Saved rules",
       }),
     );
   });

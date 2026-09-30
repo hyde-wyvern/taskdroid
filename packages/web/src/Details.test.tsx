@@ -53,7 +53,7 @@ const task: Task = {
   revision: 1,
   title: "Viewer task",
   description: "Description",
-  plan: "Plan",
+  plan: "## Task plan\n\nTask **detail**.",
   statusId: "todo",
   effort: 8,
   archivedAt: null,
@@ -64,7 +64,7 @@ const task: Task = {
       revision: 1,
       title: "Done work",
       description: "Subtask description",
-      plan: "Subtask plan",
+      plan: "### Subtask plan\n\nSubtask *detail*.",
       statusId: "closed",
       effort: 3,
       archivedAt: null,
@@ -121,6 +121,9 @@ describe("detail dialogs", () => {
         .getAttribute("aria-valuenow"),
     ).toBe("38");
     expect(screen.getByText("Tasks")).toBeTruthy();
+    expect(
+      screen.getByRole("heading", { name: "Plan", level: 1 }),
+    ).toBeTruthy();
     expect(screen.getByRole("button", { name: "Viewer task" })).toBeTruthy();
     expect(
       screen.getByRole("combobox", { name: "Viewer task status" }),
@@ -325,6 +328,10 @@ describe("detail dialogs", () => {
     expect(screen.getByText("38% complete")).toBeTruthy();
     expect(screen.getByText("3/8 effort points")).toBeTruthy();
     expect(
+      screen.getByRole("heading", { name: "Task plan", level: 2 }),
+    ).toBeTruthy();
+    expect(screen.getByText("detail").tagName).toBe("STRONG");
+    expect(
       screen
         .getByRole("progressbar", { name: "Task progress" })
         .getAttribute("aria-valuenow"),
@@ -390,7 +397,10 @@ describe("detail dialogs", () => {
         ?.classList.contains("wide"),
     ).toBe(true);
     expect(screen.getByText("Subtask description")).toBeTruthy();
-    expect(screen.getByText("Subtask plan")).toBeTruthy();
+    expect(
+      screen.getByRole("heading", { name: "Subtask plan", level: 3 }),
+    ).toBeTruthy();
+    expect(screen.getByText("detail").tagName).toBe("EM");
     expect(screen.getByText("3/3 effort points")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Edit subtask" }));
     expect(screen.getByRole("heading", { name: "Edit subtask" })).toBeTruthy();
@@ -398,7 +408,9 @@ describe("detail dialogs", () => {
       screen.getByRole("button", { name: "Archive subtask" }),
     ).toBeTruthy();
     expect(screen.getByDisplayValue("Subtask description")).toBeTruthy();
-    expect(screen.getByDisplayValue("Subtask plan")).toBeTruthy();
+    expect(
+      screen.getByRole("textbox", { name: "Detailed plan (Markdown)" }),
+    ).toHaveProperty("value", "### Subtask plan\n\nSubtask *detail*.");
     fireEvent.click(screen.getByRole("button", { name: "Open EP-2" }));
     expect(screen.getByRole("heading", { name: "Viewer task" })).toBeTruthy();
   });

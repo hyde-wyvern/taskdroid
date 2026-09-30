@@ -3,6 +3,7 @@ import { IconPencil } from "@tabler/icons-react";
 import { DetailHeader } from "./DetailHeader";
 import type { Crumb } from "./Breadcrumbs";
 import { DialogShell, IconAction, ProgressBar } from "./Controls";
+import { MarkdownContent } from "./MarkdownContent";
 
 type TextSection = { label: string; value: string; empty: string };
 type Progress = {
@@ -79,7 +80,11 @@ export function WorkItemViewer({
         </section>
         <section>
           <b>{plan.label}</b>
-          <pre>{plan.value || plan.empty}</pre>
+          {plan.value ? (
+            <MarkdownContent content={plan.value} />
+          ) : (
+            <p>{plan.empty}</p>
+          )}
         </section>
         {childSection && (
           <section>
