@@ -1,9 +1,10 @@
+import type { Plan, Task, Workflow } from "./types";
+import { afterEach, describe, expect, it, vi } from "vitest";
 // @vitest-environment jsdom
 import { cleanup, fireEvent, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { ListView } from "./ListView";
 import { PlansView } from "./PlansView";
-import type { Plan, Task, Workflow } from "./types";
 import { renderWithMantine } from "./testUtils";
 
 afterEach(cleanup);

@@ -453,43 +453,53 @@ textarea {
   color: #687287;
   font-weight: 400;
 }
-.dialog > label,
-.settings > label {
+.dialog .mantine-Modal-body:has(.form-grid) {
   display: grid;
-  gap: 6px;
-  margin: 13px 0;
-  font-size: 13px;
-  font-weight: 650;
+  gap: 14px;
 }
-.dialog > footer,
+.dialog .mantine-Modal-body > footer,
 .settings > footer {
   display: flex;
   gap: 8px;
-  margin-top: 18px;
+  margin-top: 4px;
 }
-.dialog > footer span {
+.dialog .mantine-Modal-body > footer span {
   flex: 1;
 }
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 220px;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 220px);
   gap: 12px;
+  align-items: start;
 }
-.form-grid label {
+.form-grid > *,
+.form-grid .field {
+  min-width: 0;
+}
+.form-grid .field {
   display: grid;
   gap: 6px;
+}
+.form-grid .field > label {
   font-size: 13px;
   font-weight: 650;
 }
 .subtasks {
   display: grid;
   gap: 7px;
+  min-width: 0;
 }
 .subtask {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 120px 165px minmax(80px, max-content);
+  grid-template-columns:
+    minmax(0, 1fr) minmax(88px, 120px) minmax(120px, 165px)
+    minmax(80px, max-content);
   gap: 8px;
   align-items: center;
+  min-width: 0;
+}
+.subtask > * {
+  min-width: 0;
 }
 .subtask .effort-select {
   width: 100%;

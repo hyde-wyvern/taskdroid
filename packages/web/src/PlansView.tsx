@@ -1,9 +1,10 @@
-import { StatusSelect } from "./StatusSelect";
+import type { Plan, Workflow } from "./types";
+
 import { IssueKey } from "./IssueKey";
+import { ProgressBar } from "./Controls";
+import { StatusSelect } from "./StatusSelect";
 import { isClosed } from "./isClosed";
 import { sortByWorkPriority } from "./sortNewest";
-import type { Plan, Workflow } from "./types";
-import { ProgressBar } from "./Controls";
 
 export function PlansView({
   plans,

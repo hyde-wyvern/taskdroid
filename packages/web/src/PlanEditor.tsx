@@ -1,15 +1,17 @@
-import { useEffect, useState } from "react";
-import { api } from "./api";
-import { StatusSelect } from "./StatusSelect";
-import { IssueKey } from "./IssueKey";
-import { DetailHeader } from "./DetailHeader";
-import { WorkItemViewer } from "./WorkItemViewer";
-import { useToast } from "./Toasts";
-import { EffortSelect } from "./EffortSelect";
-import { DialogShell } from "./Controls";
-import { isClosed } from "./isClosed";
-import { sortByWorkPriority, sortNewest } from "./sortNewest";
 import type { Plan, Task, Workflow } from "./types";
+import { sortByWorkPriority, sortNewest } from "./sortNewest";
+import { NumberInput, TextInput, Textarea } from "@mantine/core";
+import { useEffect, useState } from "react";
+
+import { DetailHeader } from "./DetailHeader";
+import { DialogShell, TaskButton } from "./Controls";
+import { EffortSelect } from "./EffortSelect";
+import { IssueKey } from "./IssueKey";
+import { StatusSelect } from "./StatusSelect";
+import { WorkItemViewer } from "./WorkItemViewer";
+import { api } from "./api";
+import { isClosed } from "./isClosed";
+import { useToast } from "./Toasts";
 
 export function PlanEditor({
   plan: initial,
@@ -281,41 +283,36 @@ export function PlanEditor({
       />
       <>
         <div className="form-grid">
-          <label>
-            Title
-            <input
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-            />
-          </label>
+          <TextInput
+            label="Title"
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+          />
           {plan && (
-            <label>
-              Status
+            <div className="field">
+              <label htmlFor="edit-plan-status">Status</label>
               <StatusSelect
+                id="edit-plan-status"
                 statuses={workflow.statuses}
                 value={statusId}
                 onChange={setStatusId}
                 label="Plan status"
               />
-            </label>
+            </div>
           )}
         </div>
-        <label>
-          Summary
-          <textarea
-            rows={3}
-            value={summary}
-            onChange={(event) => setSummary(event.target.value)}
-          />
-        </label>
-        <label>
-          Source plan (Markdown)
-          <textarea
-            rows={12}
-            value={sourcePlan}
-            onChange={(event) => setSourcePlan(event.target.value)}
-          />
-        </label>
+        <Textarea
+          label="Summary"
+          rows={3}
+          value={summary}
+          onChange={(event) => setSummary(event.target.value)}
+        />
+        <Textarea
+          label="Source plan (Markdown)"
+          rows={12}
+          value={sourcePlan}
+          onChange={(event) => setSourcePlan(event.target.value)}
+        />
         {plan && (
           <>
             <h3>
@@ -328,21 +325,21 @@ export function PlanEditor({
             <div className="subtasks">
               {sortByWorkPriority(draftTasks, workflow).map((task) => (
                 <div className="subtask" key={task.id}>
-                  <input
+                  <TextInput
+                    aria-label={`${task.title} title`}
                     value={task.title}
                     onChange={(event) =>
                       updateDraftTask(task.id, { title: event.target.value })
                     }
                   />
-                  <input
+                  <NumberInput
                     aria-label={`${task.title} effort`}
-                    type="number"
-                    min="0"
-                    max="100"
+                    min={0}
+                    max={100}
                     value={task.effort}
-                    onChange={(event) =>
+                    onChange={(value) =>
                       updateDraftTask(task.id, {
-                        effort: Number(event.target.value),
+                        effort: Number(value) || 0,
                       })
                     }
                   />
@@ -355,19 +352,20 @@ export function PlanEditor({
                     }
                     label={`${task.title} status`}
                   />
-                  <button
+                  <TaskButton
                     aria-label={`Archive ${task.title}`}
-                    className="danger-link"
+                    variant="danger"
                     onClick={() => void archiveTask(task)}
                   >
                     Archive
-                  </button>
+                  </TaskButton>
                 </div>
               ))}
               {newTasks.map((task, index) => (
                 <div className="subtask" key={index}>
-                  <input
+                  <TextInput
                     placeholder="New task"
+                    aria-label="New task title"
                     value={task.title}
                     onChange={(event) =>
                       updateNewTask(index, { title: event.target.value })
@@ -389,7 +387,8 @@ export function PlanEditor({
                     }
                     label="New task status"
                   />
-                  <button
+                  <TaskButton
+                    variant="danger"
                     className="danger-link"
                     onClick={() =>
                       setNewTasks((items) =>
@@ -398,20 +397,20 @@ export function PlanEditor({
                     }
                   >
                     Remove
-                  </button>
+                  </TaskButton>
                 </div>
               ))}
-              <button className="add-row" onClick={addTask}>
+              <TaskButton className="add-row" onClick={addTask}>
                 + New task
-              </button>
+              </TaskButton>
               {archivedTasks.map((task) => (
                 <div className="subtask muted" key={task.id}>
                   <span>{task.title}</span>
                   <span>{task.effort} pts</span>
                   <span>Archived</span>
-                  <button onClick={() => void restoreTask(task)}>
+                  <TaskButton onClick={() => void restoreTask(task)}>
                     Restore
-                  </button>
+                  </TaskButton>
                 </div>
               ))}
             </div>
@@ -420,22 +419,22 @@ export function PlanEditor({
       </>
       <footer>
         {plan && (
-          <button className="danger" onClick={() => void toggleArchive()}>
+          <TaskButton variant="danger" onClick={() => void toggleArchive()}>
             Archive
-          </button>
+          </TaskButton>
         )}
         <span />
-        <button onClick={plan ? () => setEditing(false) : onClose}>
+        <TaskButton onClick={plan ? () => setEditing(false) : onClose}>
           {plan ? "Cancel" : "Close"}
-        </button>
+        </TaskButton>
         {!archived && (
-          <button
-            className="primary"
+          <TaskButton
+            variant="primary"
             disabled={!title.trim()}
             onClick={() => void save()}
           >
             Save
-          </button>
+          </TaskButton>
         )}
       </footer>
     </DialogShell>

@@ -1,10 +1,11 @@
+import type { Plan, Task, Workflow } from "./types";
+import { afterEach, describe, expect, it, vi } from "vitest";
 // @vitest-environment jsdom
 import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { api } from "./api";
+
 import { PlanEditor } from "./PlanEditor";
 import { TaskEditor } from "./TaskEditor";
-import type { Plan, Task, Workflow } from "./types";
+import { api } from "./api";
 import { renderWithMantine } from "./testUtils";
 
 afterEach(() => {
@@ -160,6 +161,122 @@ describe("detail dialogs", () => {
     ]);
     await waitFor(() => expect(screen.getByText("Archived task")).toBeTruthy());
     expect(screen.getByRole("button", { name: "Restore" })).toBeTruthy();
+  });
+
+  it("keeps plan and embedded task drafts local until Save", async () => {
+    const updatePlan = vi
+      .spyOn(api, "updatePlan")
+      .mockResolvedValue({ ...plan, title: "Updated plan", revision: 2 });
+    const updateTask = vi
+      .spyOn(api, "updateTask")
+      .mockResolvedValue({ ...task, title: "Updated task", revision: 2 });
+    const createTask = vi
+      .spyOn(api, "createTask")
+      .mockResolvedValue({ ...task, id: "new-task", title: "Added task" });
+    const onSaved = vi.fn().mockResolvedValue(undefined);
+    renderWithMantine(
+      <PlanEditor
+        plan={plan}
+        tasks={[task]}
+        workflow={workflow}
+        archived={false}
+        onClose={vi.fn()}
+        onSaved={onSaved}
+        onError={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByText("Edit"));
+    fireEvent.change(screen.getByRole("textbox", { name: "Title" }), {
+      target: { value: "Updated plan" },
+    });
+    fireEvent.change(screen.getByRole("textbox", { name: "Summary" }), {
+      target: { value: "Updated summary" },
+    });
+    fireEvent.change(
+      screen.getByRole("textbox", { name: "Source plan (Markdown)" }),
+      { target: { value: "# Updated plan" } },
+    );
+    fireEvent.change(
+      screen.getByRole("textbox", { name: "Viewer task title" }),
+      { target: { value: "Updated task" } },
+    );
+    fireEvent.click(screen.getByRole("button", { name: "+ New task" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "New task title" }), {
+      target: { value: "Added task" },
+    });
+
+    expect(updatePlan).not.toHaveBeenCalled();
+    expect(updateTask).not.toHaveBeenCalled();
+    expect(createTask).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+    await waitFor(() =>
+      expect(updatePlan).toHaveBeenCalledWith(
+        "plan",
+        1,
+        expect.objectContaining({
+          title: "Updated plan",
+          summary: "Updated summary",
+          sourcePlan: "# Updated plan",
+        }),
+      ),
+    );
+    expect(updateTask).toHaveBeenCalledWith(
+      task,
+      expect.objectContaining({ title: "Updated task" }),
+    );
+    expect(createTask).toHaveBeenCalledWith(
+      "plan",
+      expect.objectContaining({ title: "Added task" }),
+    );
+    expect(onSaved).toHaveBeenCalledOnce();
+  });
+
+  it("discards plan and embedded task drafts on Cancel", () => {
+    const updatePlan = vi.spyOn(api, "updatePlan");
+    const updateTask = vi.spyOn(api, "updateTask");
+    const createTask = vi.spyOn(api, "createTask");
+    renderWithMantine(
+      <PlanEditor
+        plan={plan}
+        tasks={[task]}
+        workflow={workflow}
+        archived={false}
+        onClose={vi.fn()}
+        onSaved={vi.fn()}
+        onError={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByText("Edit"));
+    fireEvent.change(screen.getByRole("textbox", { name: "Title" }), {
+      target: { value: "Discarded plan" },
+    });
+    fireEvent.change(
+      screen.getByRole("textbox", { name: "Viewer task title" }),
+      { target: { value: "Discarded task" } },
+    );
+    fireEvent.click(screen.getByRole("button", { name: "+ New task" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "New task title" }), {
+      target: { value: "Discarded new task" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(updatePlan).not.toHaveBeenCalled();
+    expect(updateTask).not.toHaveBeenCalled();
+    expect(createTask).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByText("Edit"));
+    expect(screen.getByRole("textbox", { name: "Title" })).toHaveProperty(
+      "value",
+      "Viewer plan",
+    );
+    expect(
+      screen.getByRole("textbox", { name: "Viewer task title" }),
+    ).toHaveProperty("value", "Viewer task");
+    expect(
+      screen.queryByRole("textbox", { name: "New task title" }),
+    ).toBeNull();
   });
 
   it("opens task read-only and enables fields only after Edit", () => {

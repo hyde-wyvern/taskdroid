@@ -1,16 +1,18 @@
+import type { Subtask, Task, Workflow } from "./types";
+import { sortByWorkPriority, sortNewest } from "./sortNewest";
+import { NumberInput, TextInput, Textarea } from "@mantine/core";
 import { useEffect, useState } from "react";
-import { api } from "./api";
-import { EffortSelect } from "./EffortSelect";
-import { DialogShell } from "./Controls";
-import { IssueKey } from "./IssueKey";
+
 import { DetailHeader } from "./DetailHeader";
-import { WorkItemViewer } from "./WorkItemViewer";
+import { DialogShell, TaskButton } from "./Controls";
+import { EffortSelect } from "./EffortSelect";
+import { IssueKey } from "./IssueKey";
 import { StatusSelect } from "./StatusSelect";
 import { SubtaskEditor } from "./SubtaskEditor";
-import { useToast } from "./Toasts";
+import { WorkItemViewer } from "./WorkItemViewer";
+import { api } from "./api";
 import { isClosed } from "./isClosed";
-import { sortByWorkPriority, sortNewest } from "./sortNewest";
-import type { Subtask, Task, Workflow } from "./types";
+import { useToast } from "./Toasts";
 
 type NewSubtask = Pick<Subtask, "title" | "effort" | "statusId">;
 
@@ -274,75 +276,67 @@ export function TaskEditor({
       />
       <>
         <div className="form-grid">
-          <label>
-            Title
-            <input
-              value={title}
-              disabled={archived}
-              onChange={(event) => setTitle(event.target.value)}
-            />
-          </label>
-          <label>
-            Status
+          <TextInput
+            label="Title"
+            value={title}
+            disabled={archived}
+            onChange={(event) => setTitle(event.target.value)}
+          />
+          <div className="field">
+            <label htmlFor="edit-task-status">Status</label>
             <StatusSelect
+              id="edit-task-status"
               statuses={workflow.statuses}
               value={statusId}
               disabled={archived}
               onChange={setStatusId}
               label="Task status"
             />
-          </label>
+          </div>
         </div>
-        <label>
-          Description
-          <textarea
-            rows={3}
-            disabled={archived}
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-          />
-        </label>
-        <label>
-          Detailed plan (Markdown)
-          <textarea
-            rows={7}
-            disabled={archived}
-            value={plan}
-            onChange={(event) => setPlan(event.target.value)}
-          />
-        </label>
-        <label>
-          Effort points
-          <input
-            type="number"
-            min="0"
-            max="100"
-            disabled={archived || activeSubtasks.length > 0}
-            value={effort}
-            onChange={(event) => setEffort(Number(event.target.value))}
-          />
-        </label>
+        <Textarea
+          label="Description"
+          rows={3}
+          disabled={archived}
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
+        />
+        <Textarea
+          label="Detailed plan (Markdown)"
+          rows={7}
+          disabled={archived}
+          value={plan}
+          onChange={(event) => setPlan(event.target.value)}
+        />
+        <NumberInput
+          label="Effort points"
+          min={0}
+          max={100}
+          disabled={archived || activeSubtasks.length > 0}
+          value={effort}
+          onChange={(value) => setEffort(Number(value) || 0)}
+        />
         <h3>
           Subtasks <small>{task.effort} total points</small>
         </h3>
         <div className="subtasks">
           {sortByWorkPriority(draftSubtasks, workflow).map((subtask) => (
             <div className="subtask" key={subtask.id}>
-              <input
+              <TextInput
+                aria-label={`${subtask.title} title`}
                 value={subtask.title}
                 onChange={(event) =>
                   updateDraftSubtask(subtask.id, { title: event.target.value })
                 }
               />
-              <input
-                aria-label="Effort"
-                type="number"
-                min="0"
-                max="100"
+              <NumberInput
+                aria-label={`${subtask.title} effort`}
+                min={0}
+                max={100}
                 value={subtask.effort}
-                onChange={(event) =>
+                onChange={(value) =>
                   updateDraftSubtask(subtask.id, {
-                    effort: Number(event.target.value),
+                    effort: Number(value) || 0,
                   })
                 }
               />
@@ -355,18 +349,20 @@ export function TaskEditor({
                 }
                 label={`${subtask.title} status`}
               />
-              <button
+              <TaskButton
+                variant="danger"
                 className="danger-link"
                 onClick={() => void archiveSubtask(subtask)}
               >
                 Archive
-              </button>
+              </TaskButton>
             </div>
           ))}
           {newSubtasks.map((subtask, index) => (
             <div className="subtask" key={index}>
-              <input
+              <TextInput
                 placeholder="New subtask"
+                aria-label="New subtask title"
                 value={subtask.title}
                 onChange={(event) =>
                   updateNewSubtask(index, { title: event.target.value })
@@ -388,7 +384,8 @@ export function TaskEditor({
                 }
                 label="New subtask status"
               />
-              <button
+              <TaskButton
+                variant="danger"
                 className="danger-link"
                 onClick={() =>
                   setNewSubtasks((items) =>
@@ -397,42 +394,42 @@ export function TaskEditor({
                 }
               >
                 Remove
-              </button>
+              </TaskButton>
             </div>
           ))}
           {!archived && (
-            <button className="add-row" onClick={addSubtask}>
+            <TaskButton className="add-row" onClick={addSubtask}>
               + New subtask
-            </button>
+            </TaskButton>
           )}
           {archivedSubtasks.map((subtask) => (
             <div className="subtask muted" key={subtask.id}>
               <span>{subtask.title}</span>
               <span>{subtask.effort} pts</span>
               <span>Archived</span>
-              <button
+              <TaskButton
                 onClick={() =>
                   void run(() => api.restoreSubtask(task, subtask.id))
                 }
               >
                 Restore
-              </button>
+              </TaskButton>
             </div>
           ))}
         </div>
       </>
       <footer>
-        <button
-          className="danger"
+        <TaskButton
+          variant="danger"
           onClick={() => void run(() => api.archiveTask(task), "Task archived")}
         >
           Archive task
-        </button>
+        </TaskButton>
         <span />
-        <button onClick={() => setEditing(false)}>Cancel</button>
-        <button className="primary" onClick={() => void save()}>
+        <TaskButton onClick={() => setEditing(false)}>Cancel</TaskButton>
+        <TaskButton variant="primary" onClick={() => void save()}>
           Save
-        </button>
+        </TaskButton>
       </footer>
     </DialogShell>
   );

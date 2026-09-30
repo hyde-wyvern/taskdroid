@@ -1,12 +1,14 @@
+import { NumberInput, TextInput, Textarea } from "@mantine/core";
 import { useState } from "react";
-import { api } from "./api";
-import { StatusSelect } from "./StatusSelect";
-import { DialogShell } from "./Controls";
-import { DetailHeader } from "./DetailHeader";
-import { WorkItemViewer } from "./WorkItemViewer";
-import { useToast } from "./Toasts";
-import { isClosed } from "./isClosed";
 import type { Subtask, Task, Workflow } from "./types";
+
+import { DetailHeader } from "./DetailHeader";
+import { DialogShell, TaskButton } from "./Controls";
+import { StatusSelect } from "./StatusSelect";
+import { WorkItemViewer } from "./WorkItemViewer";
+import { api } from "./api";
+import { isClosed } from "./isClosed";
+import { useToast } from "./Toasts";
 
 export function SubtaskEditor({
   task,
@@ -152,63 +154,55 @@ export function SubtaskEditor({
       />
       <>
         <div className="form-grid">
-          <label>
-            Title
-            <input
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-            />
-          </label>
-          <label>
-            Status
+          <TextInput
+            label="Title"
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+          />
+          <div className="field">
+            <label htmlFor="edit-subtask-status">Status</label>
             <StatusSelect
+              id="edit-subtask-status"
               statuses={workflow.statuses}
               value={statusId}
               onChange={setStatusId}
               label="Subtask status"
             />
-          </label>
+          </div>
         </div>
-        <label>
-          Description
-          <textarea
-            rows={3}
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-          />
-        </label>
-        <label>
-          Detailed plan (Markdown)
-          <textarea
-            rows={7}
-            value={plan}
-            onChange={(event) => setPlan(event.target.value)}
-          />
-        </label>
-        <label>
-          Effort points
-          <input
-            type="number"
-            min="0"
-            max="100"
-            value={effort}
-            onChange={(event) => setEffort(Number(event.target.value))}
-          />
-        </label>
+        <Textarea
+          label="Description"
+          rows={3}
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
+        />
+        <Textarea
+          label="Detailed plan (Markdown)"
+          rows={7}
+          value={plan}
+          onChange={(event) => setPlan(event.target.value)}
+        />
+        <NumberInput
+          label="Effort points"
+          min={0}
+          max={100}
+          value={effort}
+          onChange={(value) => setEffort(Number(value) || 0)}
+        />
       </>
       <footer>
-        <button className="danger" onClick={() => void archive()}>
+        <TaskButton variant="danger" onClick={() => void archive()}>
           Archive subtask
-        </button>
+        </TaskButton>
         <span />
-        <button onClick={() => setEditing(false)}>Cancel</button>
-        <button
-          className="primary"
+        <TaskButton onClick={() => setEditing(false)}>Cancel</TaskButton>
+        <TaskButton
+          variant="primary"
           disabled={!title.trim()}
           onClick={() => void save()}
         >
           Save
-        </button>
+        </TaskButton>
       </footer>
     </DialogShell>
   );
