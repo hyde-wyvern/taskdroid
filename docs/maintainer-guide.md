@@ -1,6 +1,6 @@
 # Maintainer and Release Guide
 
-Pull requests and pushes to `main` run GitHub CI. Pushing `v0.1.0` runs the guarded release workflow in `.github/workflows/release.yml`; it validates and publishes the four runtime packages, then creates a GitHub release. Do not push the release tag until the account, package permissions, and npm trusted publishers are ready.
+Pull requests and pushes to `main` run GitHub CI. Pushing `v0.1.0` runs the guarded release workflow in `.github/workflows/release.yml`; it validates and publishes the four runtime packages, then creates a GitHub release. Because this is the first publication, the package pages do not yet exist for npm trusted-publisher setup; the workflow requires the `NPM_TOKEN` bootstrap secret.
 
 ## Pre-release checks
 
@@ -28,15 +28,19 @@ Pull requests and pushes to `main` run GitHub CI. Pushing `v0.1.0` runs the guar
 
 ## GitHub and npm permissions
 
-For npm trusted publishing, configure each public package (`@culto/taskdroid-core`, `@culto/taskdroid-server`, `@culto/taskdroid-mcp`, and `@culto/taskdroid`) in npm's package Settings → Trusted publishing to trust GitHub Actions from owner `hyde-wyvern`, repository `taskdroid`, workflow filename `release.yml`, with no GitHub environment configured. In Allowed actions, explicitly enable direct `npm publish` (not only `npm stage publish`). Repeat this for all four packages. The workflow grants `id-token: write` only to the release job, disables package-manager caching, and installs npm 11.5.1 or newer for OIDC publishing. GitHub release creation uses `contents: write`.
+### First publication bootstrap
 
-Manual authentication fallback: if npm trusted publishing is unavailable, create an npm granular access token with read/write publish permission restricted to these four packages, then add it as the repository Actions secret `NPM_TOKEN`. The release workflow uses that secret only when present; otherwise it uses OIDC. Remove the fallback secret after the release. Never commit or print the token.
+The packages must exist before npm offers their per-package Trusted Publisher settings. For the initial `v0.1.0` publication, create a granular access token on npmjs.com with **Read and write (publish and stage)** permission restricted to the `@culto` scope or the four package names. Enable **Bypass two-factor authentication** for package publishing if the account or packages require 2FA. Store it as the repository Actions secret `NPM_TOKEN`; the release workflow fails fast if it is missing. Never commit or print the token.
+
+### Trusted publishing after bootstrap
+
+After the first publication, configure each package (`@culto/taskdroid-core`, `@culto/taskdroid-server`, `@culto/taskdroid-mcp`, and `@culto/taskdroid`) in npm's package Settings → Trusted publishing: provider GitHub Actions, owner `hyde-wyvern`, repository `taskdroid`, workflow filename `release.yml`, and no GitHub environment. In Allowed actions, explicitly enable direct `npm publish` (not only `npm stage publish`). Repeat for all four packages. The release job grants `id-token: write`, disables package-manager caching, and installs npm 11.5.1 or newer. After a later-version workflow has been verified with OIDC, remove `NPM_TOKEN`. GitHub release creation uses `contents: write`.
 
 The release job runs `scripts/check-packages.mjs` against the tag version before publishing. It publishes core, server, MCP, then CLI, and creates generated release notes/source archives only after all package publishes succeed. The `@culto/taskdroid-web` workspace remains private and is bundled into the CLI.
 
 ## Publish and smoke test
 
-The tagged workflow performs publication in dependency order. When using the token fallback, add `NPM_TOKEN` before pushing the release tag; the same workflow then publishes and creates the GitHub release. Do not manually publish packages and also trigger the automatic release workflow for the same version.
+For the first release, add `NPM_TOKEN` before pushing `v0.1.0`; the tagged workflow then publishes and creates the GitHub release. Do not manually publish packages and also trigger the automatic release workflow for the same version.
 
 From a clean temporary directory and a Node.js 22+ environment, install the packed runtime tarballs, initialize a project, start the dashboard, and confirm `/` serves the packaged HTML, its hashed JavaScript/CSS assets load, and the API returns the initialized project. Configure an MCP client to launch `taskdroid mcp` with the test project as its working directory, then verify `get_project`, `get_workflow`, and direct `get_plan`, `get_task`, and `get_subtask` lookups by issue key, as well as ID-based mutations with current revisions. Finally run `taskdroid validate` against the clean project.
 

@@ -36,9 +36,11 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          if [[ -n "${NPM_TOKEN:-}" ]]; then
-            export NODE_AUTH_TOKEN="$NPM_TOKEN"
+          if [[ -z "${NPM_TOKEN:-}" ]]; then
+            echo "::error::The first v0.1.0 publish requires the NPM_TOKEN bootstrap secret; npm trusted publishers can only be configured after packages exist."
+            exit 1
           fi
+          export NODE_AUTH_TOKEN="$NPM_TOKEN"
           npm publish --workspace @culto/taskdroid-core --access public --provenance --registry=https://registry.npmjs.org/
           npm publish --workspace @culto/taskdroid-server --access public --provenance --registry=https://registry.npmjs.org/
           npm publish --workspace @culto/taskdroid-mcp --access public --provenance --registry=https://registry.npmjs.org/
