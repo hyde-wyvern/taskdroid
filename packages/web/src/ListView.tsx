@@ -387,7 +387,6 @@ export function ListView({
 function isComplete(workflow: Workflow, statusId: string) {
   return workflow.statuses.some(
     (status) =>
-      status.id === statusId &&
-      (status.completed || status.fixed === "closed"),
+      status.id === statusId && (status.completed || status.fixed === "closed"),
   );
 }

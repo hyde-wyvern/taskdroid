@@ -6,9 +6,7 @@ import { DocumentEditorDialog } from "./DocumentEditorDialog";
 import { IconAction } from "./Controls";
 import type { Plan, Project, Workflow } from "./types";
 
-type DocumentDialogState =
-  | { mode: "create" }
-  | { mode: "edit"; name: string };
+type DocumentDialogState = { mode: "create" } | { mode: "edit"; name: string };
 
 export function ProjectView({
   project,
@@ -34,9 +32,7 @@ export function ProjectView({
   onDocumentChange?: (name?: string) => void;
 }) {
   const [documents, setDocuments] = useState(project.documents);
-  const [active, setActive] = useState(
-    activeDocumentName ?? "description.md",
-  );
+  const [active, setActive] = useState(activeDocumentName ?? "description.md");
   const [documentDialog, setDocumentDialog] =
     useState<DocumentDialogState | null>(null);
   const names = Object.keys(documents);
@@ -44,7 +40,10 @@ export function ProjectView({
   useEffect(() => {
     setDocuments(project.documents);
     setActive((current) => {
-      if (activeDocumentName && project.documents[activeDocumentName] !== undefined) {
+      if (
+        activeDocumentName &&
+        project.documents[activeDocumentName] !== undefined
+      ) {
         return activeDocumentName;
       }
       return project.documents[current] === undefined
@@ -135,7 +134,7 @@ export function ProjectView({
           }
           initialContent={
             documentDialog.mode === "edit"
-              ? documents[documentDialog.name] ?? ""
+              ? (documents[documentDialog.name] ?? "")
               : ""
           }
           existingNames={names}

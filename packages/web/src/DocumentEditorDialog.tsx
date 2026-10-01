@@ -28,11 +28,11 @@ export function DocumentEditorDialog({
   const filename = normalizeFilename(name);
   const duplicate = Boolean(
     filename &&
-      existingNames.some(
-        (existing) =>
-          existing.toLocaleLowerCase() === filename.toLocaleLowerCase() &&
-          existing !== initialName,
-      ),
+    existingNames.some(
+      (existing) =>
+        existing.toLocaleLowerCase() === filename.toLocaleLowerCase() &&
+        existing !== initialName,
+    ),
   );
   const nameError = !name.trim()
     ? "Document title is required"
@@ -63,11 +63,7 @@ export function DocumentEditorDialog({
 
   return (
     <DialogShell title={title} onClose={onClose} wide>
-      <DetailHeader
-        title={title}
-        crumbs={[]}
-        onClose={onClose}
-      />
+      <DetailHeader title={title} crumbs={[]} onClose={onClose} />
       <div className="document-editor-form">
         <TextInput
           label="Document title"

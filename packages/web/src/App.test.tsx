@@ -1,5 +1,11 @@
 // @vitest-environment jsdom
-import { act, cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 import { api } from "./api";
@@ -174,16 +180,22 @@ describe("App navigation and selected-plan state", () => {
     expect(darkMode).toHaveProperty("checked", false);
     fireEvent.click(darkMode);
     await waitFor(() => expect(darkMode).toHaveProperty("checked", true));
-    expect(document.documentElement.getAttribute("data-mantine-color-scheme")).toBe("dark");
+    expect(
+      document.documentElement.getAttribute("data-mantine-color-scheme"),
+    ).toBe("dark");
 
     openMenu();
     fireEvent.click(document.querySelector('[aria-label="Settings"]')!);
-    expect(await screen.findByRole("heading", { name: "Workflow settings" })).toBeTruthy();
+    expect(
+      await screen.findByRole("heading", { name: "Workflow settings" }),
+    ).toBeTruthy();
     expect(window.location.pathname).toBe("/settings");
 
     openMenu();
     fireEvent.click(document.querySelector('[aria-label="Documentation"]')!);
-    expect(await screen.findByRole("heading", { name: "Taskdroid documentation" })).toBeTruthy();
+    expect(
+      await screen.findByRole("heading", { name: "Taskdroid documentation" }),
+    ).toBeTruthy();
     expect(window.location.pathname).toBe("/documentation");
   });
 
@@ -206,8 +218,14 @@ describe("App navigation and selected-plan state", () => {
 
     renderWithMantine(<App />);
 
-    expect(await screen.findByRole("heading", { name: "Agent instructions" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Project", exact: true }).getAttribute("aria-pressed")).toBe("true");
+    expect(
+      await screen.findByRole("heading", { name: "Agent instructions" }),
+    ).toBeTruthy();
+    expect(
+      screen
+        .getByRole("button", { name: "Project", exact: true })
+        .getAttribute("aria-pressed"),
+    ).toBe("true");
     await waitFor(() =>
       expect(window.location.pathname + window.location.search).toBe(
         "/project?document=agents.md",
@@ -215,7 +233,9 @@ describe("App navigation and selected-plan state", () => {
     );
 
     fireEvent.click(screen.getByRole("tab", { name: "description.md" }));
-    expect(await screen.findByRole("heading", { name: "Overview" })).toBeTruthy();
+    expect(
+      await screen.findByRole("heading", { name: "Overview" }),
+    ).toBeTruthy();
     expect(window.location.search).toBe("?document=description.md");
     window.history.pushState(null, "", "/project?document=deleted.md");
     await act(async () => {
@@ -233,7 +253,11 @@ describe("App navigation and selected-plan state", () => {
   });
 
   it("restores nested detail routes and responds to Back/Forward popstate", async () => {
-    window.history.replaceState(null, "", "/list?detail=task%3Atask&search=ignored");
+    window.history.replaceState(
+      null,
+      "",
+      "/list?detail=task%3Atask&search=ignored",
+    );
     vi.stubGlobal(
       "EventSource",
       class {
@@ -247,26 +271,40 @@ describe("App navigation and selected-plan state", () => {
 
     renderWithMantine(<App />);
 
-    expect(await screen.findByRole("heading", { name: "Linked task" })).toBeTruthy();
+    expect(
+      await screen.findByRole("heading", { name: "Linked task" }),
+    ).toBeTruthy();
     await waitFor(() =>
       expect(window.location.pathname + window.location.search).toBe(
         "/list?detail=task%3Atask",
       ),
     );
     fireEvent.click(screen.getByRole("button", { name: "Linked subtask" }));
-    expect(await screen.findByRole("heading", { name: "Linked subtask" })).toBeTruthy();
+    expect(
+      await screen.findByRole("heading", { name: "Linked subtask" }),
+    ).toBeTruthy();
     expect(window.location.search).toBe("?detail=subtask%3Atask%3Asubtask");
 
     window.history.pushState(null, "", "/list?detail=task%3Atask");
     await act(async () => {
       window.dispatchEvent(new PopStateEvent("popstate"));
     });
-    expect(await screen.findByRole("heading", { name: "Linked task" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "List", exact: true }).getAttribute("aria-pressed")).toBe("true");
+    expect(
+      await screen.findByRole("heading", { name: "Linked task" }),
+    ).toBeTruthy();
+    expect(
+      screen
+        .getByRole("button", { name: "List", exact: true })
+        .getAttribute("aria-pressed"),
+    ).toBe("true");
     fireEvent.click(screen.getByRole("button", { name: "Close" }));
-    await waitFor(() => expect(window.location.pathname + window.location.search).toBe("/list"));
+    await waitFor(() =>
+      expect(window.location.pathname + window.location.search).toBe("/list"),
+    );
     fireEvent.click(screen.getByRole("button", { name: "Linked task" }));
-    expect(await screen.findByRole("heading", { name: "Linked task" })).toBeTruthy();
+    expect(
+      await screen.findByRole("heading", { name: "Linked task" }),
+    ).toBeTruthy();
     expect(window.location.pathname + window.location.search).toBe(
       "/list?detail=task%3Atask",
     );
@@ -291,9 +329,17 @@ describe("App navigation and selected-plan state", () => {
 
     renderWithMantine(<App />);
 
-    expect(await screen.findByRole("heading", { name: "Agent instructions" })).toBeTruthy();
-    expect(await screen.findByRole("heading", { name: "Platform" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Project", exact: true }).getAttribute("aria-pressed")).toBe("true");
+    expect(
+      await screen.findByRole("heading", { name: "Agent instructions" }),
+    ).toBeTruthy();
+    expect(
+      await screen.findByRole("heading", { name: "Platform" }),
+    ).toBeTruthy();
+    expect(
+      screen
+        .getByRole("button", { name: "Project", exact: true })
+        .getAttribute("aria-pressed"),
+    ).toBe("true");
     await waitFor(() =>
       expect(window.location.pathname + window.location.search).toBe(
         "/project?document=agents.md&detail=plan%3Aplan",
@@ -326,8 +372,14 @@ describe("App navigation and selected-plan state", () => {
 
     renderWithMantine(<App />);
 
-    expect(await screen.findByRole("heading", { name: "Linked subtask" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Board", exact: true }).getAttribute("aria-pressed")).toBe("true");
+    expect(
+      await screen.findByRole("heading", { name: "Linked subtask" }),
+    ).toBeTruthy();
+    expect(
+      screen
+        .getByRole("button", { name: "Board", exact: true })
+        .getAttribute("aria-pressed"),
+    ).toBe("true");
     expect(window.location.pathname + window.location.search).toBe(
       "/board?detail=subtask%3Atask%3Asubtask",
     );

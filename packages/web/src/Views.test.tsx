@@ -249,7 +249,9 @@ describe("project views", () => {
     expect(
       screen.getByRole("button", { name: "Expand Platform plan" }),
     ).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Expand Platform plan" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Expand Platform plan" }),
+    );
     expect(screen.getByText("Queued work")).toBeTruthy();
   });
 

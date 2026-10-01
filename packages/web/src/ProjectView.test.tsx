@@ -110,29 +110,33 @@ describe("ProjectView documents", () => {
     const editDocument = screen.getByRole("button", {
       name: "Edit document",
     });
-    expect(activeTab.parentElement?.classList.contains("document-tab-item")).toBe(
-      true,
-    );
+    expect(
+      activeTab.parentElement?.classList.contains("document-tab-item"),
+    ).toBe(true);
     expect(activeTab.parentElement?.classList.contains("active")).toBe(true);
     expect(editDocument.parentElement).toBe(activeTab.parentElement);
-    expect(editDocument.closest(".document-tab-item")).toBe(activeTab.parentElement);
-    expect(screen.queryByRole("button", { name: "Edit document" })?.closest(".view-heading")).toBeNull();
+    expect(editDocument.closest(".document-tab-item")).toBe(
+      activeTab.parentElement,
+    );
+    expect(
+      screen
+        .queryByRole("button", { name: "Edit document" })
+        ?.closest(".view-heading"),
+    ).toBeNull();
     fireEvent.mouseEnter(editDocument);
     await waitFor(() =>
-      expect(screen.getByRole("tooltip", { name: "Edit document" })).toBeTruthy(),
+      expect(
+        screen.getByRole("tooltip", { name: "Edit document" }),
+      ).toBeTruthy(),
     );
     fireEvent.click(editDocument);
     expect(screen.getByRole("dialog", { name: "Edit document" })).toBeTruthy();
-    expect(screen.getByRole("textbox", { name: "Document title" })).toHaveProperty(
-      "value",
-      "agents",
-    );
-    fireEvent.change(
+    expect(
       screen.getByRole("textbox", { name: "Document title" }),
-      {
-        target: { value: "discarded-name" },
-      },
-    );
+    ).toHaveProperty("value", "agents");
+    fireEvent.change(screen.getByRole("textbox", { name: "Document title" }), {
+      target: { value: "discarded-name" },
+    });
     fireEvent.change(
       screen.getByRole("textbox", { name: "Document content (Markdown)" }),
       { target: { value: "# Discarded draft" } },
@@ -144,12 +148,9 @@ describe("ProjectView documents", () => {
     expect(onSave).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole("button", { name: "Edit document" }));
-    fireEvent.change(
-      screen.getByRole("textbox", { name: "Document title" }),
-      {
-        target: { value: "team-rules" },
-      },
-    );
+    fireEvent.change(screen.getByRole("textbox", { name: "Document title" }), {
+      target: { value: "team-rules" },
+    });
     fireEvent.change(
       screen.getByRole("textbox", { name: "Document content (Markdown)" }),
       { target: { value: "# Saved rules" } },
@@ -191,10 +192,9 @@ describe("ProjectView documents", () => {
     expect(
       screen.getByText("A document with this title already exists"),
     ).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Save document" })).toHaveProperty(
-      "disabled",
-      true,
-    );
+    expect(
+      screen.getByRole("button", { name: "Save document" }),
+    ).toHaveProperty("disabled", true);
 
     fireEvent.change(screen.getByRole("textbox", { name: "Document title" }), {
       target: { value: "meeting-notes" },

@@ -18,12 +18,13 @@ import { WorkFilters, type WorkFilterValues } from "./WorkFilters";
 import { fuzzyMatch } from "./fuzzySearch";
 import { ToastProvider, useToast } from "./Toasts";
 import { sortByWorkPriority } from "./sortNewest";
-import { parseRoute, serializeRoute, type AppRoute, type AppView } from "./routes";
 import {
-  IconMoonStars,
-  IconSun,
-  IconX,
-} from "@tabler/icons-react";
+  parseRoute,
+  serializeRoute,
+  type AppRoute,
+  type AppView,
+} from "./routes";
+import { IconMoonStars, IconSun, IconX } from "@tabler/icons-react";
 import { IconAction, TaskButton } from "./Controls";
 import type { Plan, Progress, Project, Task, Workflow } from "./types";
 
@@ -106,7 +107,9 @@ function TaskdroidApp() {
     }
     setTasksLoaded(false);
     try {
-      const loaded = await api.tasks(hasTaskRoute ? undefined : planId || undefined);
+      const loaded = await api.tasks(
+        hasTaskRoute ? undefined : planId || undefined,
+      );
       const active = loaded.filter((task) => !task.archivedAt);
       setTasks(active);
       setTasksLoaded(true);
@@ -192,7 +195,9 @@ function TaskdroidApp() {
     if (!tasksLoaded) return;
     const detail = route.detail;
     const target = tasks.find((item) =>
-      detail.kind === "task" ? item.id === detail.id : item.id === detail.taskId,
+      detail.kind === "task"
+        ? item.id === detail.id
+        : item.id === detail.taskId,
     );
     if (!target) {
       setSelectedTask(undefined);
@@ -362,7 +367,9 @@ function TaskdroidApp() {
                 <Switch
                   checked={computedColorScheme === "dark"}
                   onChange={(event) =>
-                    setColorScheme(event.currentTarget.checked ? "dark" : "light")
+                    setColorScheme(
+                      event.currentTarget.checked ? "dark" : "light",
+                    )
                   }
                   aria-label="Dark mode"
                   thumbIcon={
@@ -431,9 +438,9 @@ function TaskdroidApp() {
               plans={dashboardPlans}
               workflow={project.workflow}
               activeDocumentName={route.documentName}
-                onDocumentChange={(name) =>
-                  updateRoute({ ...route, documentName: name })
-                }
+              onDocumentChange={(name) =>
+                updateRoute({ ...route, documentName: name })
+              }
               onSelect={(selected) => openPlan(selected.id)}
               onCreate={() => {
                 setPlanId("");

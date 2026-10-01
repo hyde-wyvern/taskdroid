@@ -19,7 +19,9 @@ describe("MarkdownEditor", () => {
       screen.getByRole("textbox", { name: "Detailed plan (Markdown)" }),
     ).toHaveProperty("value", "# Draft plan");
     expect(screen.queryByRole("heading", { name: "Draft plan" })).toBeNull();
-    fireEvent.click(await screen.findByRole("button", { name: /Preview code/ }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: /Preview code/ }),
+    );
     expect(
       await screen.findByRole("heading", { name: "Draft plan" }),
     ).toBeTruthy();
@@ -28,7 +30,9 @@ describe("MarkdownEditor", () => {
       screen.getByRole("textbox", { name: "Detailed plan (Markdown)" }),
       { target: { value: "## Updated draft" } },
     );
-    await waitFor(() => expect(onChange).toHaveBeenCalledWith("## Updated draft"));
+    await waitFor(() =>
+      expect(onChange).toHaveBeenCalledWith("## Updated draft"),
+    );
   });
 
   it("sanitizes raw HTML in its preview", async () => {
@@ -41,6 +45,8 @@ describe("MarkdownEditor", () => {
     );
 
     await waitFor(() => expect(container.querySelector("img")).toBeNull());
-    expect(screen.getByRole("textbox", { name: "Source plan (Markdown)" })).toBeTruthy();
+    expect(
+      screen.getByRole("textbox", { name: "Source plan (Markdown)" }),
+    ).toBeTruthy();
   });
 });

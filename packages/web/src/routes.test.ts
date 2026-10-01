@@ -46,9 +46,9 @@ describe("app routes", () => {
     expect(
       parseRoute("/project?document=../unsafe.md&detail=task%3Ainvalid%2Fid"),
     ).toEqual({ view: "plans" });
-    expect(
-      parseRoute("/list?detail=subtask%3Atask-1"),
-    ).toEqual({ view: "list" });
+    expect(parseRoute("/list?detail=subtask%3Atask-1")).toEqual({
+      view: "list",
+    });
     expect(
       serializeRoute({ view: "plans", documentName: "../unsafe.md" }),
     ).toBe("/project");

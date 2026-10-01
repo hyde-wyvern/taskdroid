@@ -33,7 +33,8 @@ const safeRecordId = /^[a-zA-Z0-9_-]+$/;
 export function parseRoute(input: string | URL): AppRoute {
   let url: URL;
   try {
-    url = input instanceof URL ? input : new URL(input, "http://taskdroid.local");
+    url =
+      input instanceof URL ? input : new URL(input, "http://taskdroid.local");
   } catch {
     return { view: "board" };
   }
@@ -78,11 +79,7 @@ function parseDetail(value: string | null): RouteDetail | undefined {
   if (kind === "plan" || kind === "task") {
     return secondId === undefined ? { kind, id: firstId } : undefined;
   }
-  if (
-    kind === "subtask" &&
-    secondId &&
-    safeRecordId.test(secondId)
-  ) {
+  if (kind === "subtask" && secondId && safeRecordId.test(secondId)) {
     return { kind, taskId: firstId, id: secondId };
   }
   return undefined;
@@ -91,7 +88,9 @@ function parseDetail(value: string | null): RouteDetail | undefined {
 function serializeDetail(detail: RouteDetail | undefined): string | undefined {
   if (!detail) return undefined;
   if (detail.kind === "plan" || detail.kind === "task") {
-    return safeRecordId.test(detail.id) ? `${detail.kind}:${detail.id}` : undefined;
+    return safeRecordId.test(detail.id)
+      ? `${detail.kind}:${detail.id}`
+      : undefined;
   }
   return safeRecordId.test(detail.taskId) && safeRecordId.test(detail.id)
     ? `subtask:${detail.taskId}:${detail.id}`
