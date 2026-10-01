@@ -7,7 +7,7 @@ Taskdroid 0.1.0 is a pre-1.0 preview. Expect changes; stable schema and API comp
 ## Who it is for
 
 - **Project owners** who want a local dashboard for plans, tasks, workflow, and project notes.
-- **AI agents** that need structured work context and revision-safe MCP tools.
+- **AI agents** that need structured work context, direct plan/task/subtask lookup by issue key, and revision-safe MCP tools.
 - **Contributors and maintainers** building and releasing the npm workspace.
 
 ## Requirements and installation

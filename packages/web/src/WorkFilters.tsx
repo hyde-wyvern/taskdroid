@@ -5,6 +5,7 @@ import { ProgressBar } from "./Controls";
 import { TaskButton } from "./Controls";
 
 type StatusSelection = string[] | null;
+export const ACTIVE_PLANS_FILTER = "__active_plans__";
 export type WorkFilterValues = {
   search: string;
   planStatusIds: StatusSelection;
@@ -51,6 +52,7 @@ export function WorkFilters({
             classNames={{ input: "plan-filter" }}
             data={[
               { value: "", label: "All plans" },
+              { value: ACTIVE_PLANS_FILTER, label: "Active plans" },
               ...plans.map((item) => ({ value: item.id, label: item.title })),
             ]}
             value={planId}

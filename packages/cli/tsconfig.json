@@ -2,5 +2,6 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": { "composite": true, "rootDir": "src", "outDir": "dist" },
   "references": [{ "path": "../core" }, { "path": "../server" }, { "path": "../mcp" }],
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.test.ts"]
 }

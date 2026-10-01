@@ -22,7 +22,7 @@ This guide records the manual preview release gates for Taskdroid. There is no a
    npm pack --workspace @taskdroid/cli --dry-run
    ```
 
-   Confirm the CLI package contains its runtime dependencies, declarations, README, license, and built dashboard assets. Confirm project-local data, tests, and development-only files are excluded. The web workspace remains private.
+   `npm run build -w @taskdroid/cli` builds the private web workspace and copies its Vite output to `packages/cli/dist/web`. Confirm the CLI tarball contains `dist/web/index.html` and its referenced assets, declarations, README, and license. Confirm workspace source, project-local data, tests, and development-only files are excluded. The web workspace remains private.
 
 5. Verify npm ownership and public-scope publishing permission for `@taskdroid` before the first publication. Confirm the target package names and registry state with `npm view`.
 
@@ -30,6 +30,6 @@ This guide records the manual preview release gates for Taskdroid. There is no a
 
 Publish the runtime packages in dependency order: core, server and MCP, then CLI. Publish scoped packages publicly when required by the npm account configuration. Create a version tag and GitHub release only after registry artifacts are available.
 
-From a clean temporary directory and a Node.js 22+ environment, install the published CLI, initialize a project, start the dashboard, and confirm the onboarding, API, and project views load. Configure an MCP client to launch `taskdroid mcp` with the test project as its working directory, then verify `get_project`, `get_workflow`, and a read-only plan/task workflow. Finally run `taskdroid validate` against the clean project.
+From a clean temporary directory and a Node.js 22+ environment, install the packed runtime tarballs, initialize a project, start the dashboard, and confirm `/` serves the packaged HTML, its hashed JavaScript/CSS assets load, and the API returns the initialized project. Configure an MCP client to launch `taskdroid mcp` with the test project as its working directory, then verify `get_project`, `get_workflow`, and direct `get_plan`, `get_task`, and `get_subtask` lookups by issue key, as well as ID-based mutations with current revisions. Finally run `taskdroid validate` against the clean project.
 
 Do not describe the release as verified until the packed CLI has been tested independently of the monorepo. Record the exact package versions and smoke-test results in the GitHub release notes.

@@ -15,7 +15,11 @@ import { PlanEditor } from "./PlanEditor";
 import { ProjectView } from "./ProjectView";
 import { Settings } from "./Settings";
 import { TaskEditor } from "./TaskEditor";
-import { WorkFilters, type WorkFilterValues } from "./WorkFilters";
+import {
+  ACTIVE_PLANS_FILTER,
+  WorkFilters,
+  type WorkFilterValues,
+} from "./WorkFilters";
 import { fuzzyMatch } from "./fuzzySearch";
 import { ToastProvider, useToast } from "./Toasts";
 import { sortByWorkPriority } from "./sortNewest";
@@ -95,7 +99,7 @@ function TaskdroidApp() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [plansLoaded, setPlansLoaded] = useState(false);
   const [planId, setPlanId] = useState(() =>
-    route.detail?.kind === "plan" ? route.detail.id : "",
+    route.detail?.kind === "plan" ? route.detail.id : ACTIVE_PLANS_FILTER,
   );
   const [tasks, setTasks] = useState<Task[]>([]);
   const [tasksLoaded, setTasksLoaded] = useState(false);
@@ -141,7 +145,11 @@ function TaskdroidApp() {
       setPlans(nextPlans);
       setPlansLoaded(true);
       setPlanId((current) =>
-        nextPlans.some((plan) => plan.id === current) ? current : "",
+        !current ||
+        current === ACTIVE_PLANS_FILTER ||
+        nextPlans.some((plan) => plan.id === current)
+          ? current
+          : ACTIVE_PLANS_FILTER,
       );
       setError("");
     } catch (cause) {
@@ -160,9 +168,9 @@ function TaskdroidApp() {
     }
     setTasksLoaded(false);
     try {
-      const loaded = await api.tasks(
-        hasTaskRoute ? undefined : planId || undefined,
-      );
+      const selectedPlanId =
+        planId === ACTIVE_PLANS_FILTER ? undefined : planId || undefined;
+      const loaded = await api.tasks(hasTaskRoute ? undefined : selectedPlanId);
       const active = loaded.filter((task) => !task.archivedAt);
       setTasks(active);
       setTasksLoaded(true);
@@ -295,7 +303,9 @@ function TaskdroidApp() {
   const filteredTasks = filterTasks(tasks, filters);
   const visiblePlans = plans.filter(
     (item) =>
-      (!planId || item.id === planId) &&
+      (planId === ACTIVE_PLANS_FILTER
+        ? item.statusId === project?.workflow.startStatusId
+        : !planId || item.id === planId) &&
       includesStatus(filters.planStatusIds, item.statusId),
   );
   const visibleTasks = filteredTasks.filter((task) =>
@@ -370,7 +380,7 @@ function TaskdroidApp() {
     }
   }
   function clearFilters() {
-    setPlanId("");
+    setPlanId(ACTIVE_PLANS_FILTER);
     setFilters({
       search: "",
       planStatusIds: null,
@@ -607,7 +617,19 @@ function TaskdroidApp() {
                   onError={(cause) => setError(message(cause))}
                 />
               ) : (
-                <Empty create={() => setEditingPlan(true)} />
+                <Empty
+                  title={
+                    planId === ACTIVE_PLANS_FILTER
+                      ? "No active plans"
+                      : plans.length
+                        ? "No plans match the current filters"
+                        : "No plans yet"
+                  }
+                  createLabel={
+                    plans.length ? "Create a plan" : "Create first plan"
+                  }
+                  create={() => setEditingPlan(true)}
+                />
               )}
             </>
           )
@@ -654,12 +676,20 @@ function TaskdroidApp() {
   );
 }
 
-function Empty({ create }: { create: () => void }) {
+function Empty({
+  create,
+  createLabel,
+  title,
+}: {
+  create: () => void;
+  createLabel?: string;
+  title?: string;
+}) {
   return (
     <div className="empty">
-      <h2>No plans yet</h2>
+      <h2>{title ?? "No plans yet"}</h2>
       <TaskButton variant="primary" onClick={create}>
-        Create first plan
+        {createLabel ?? "Create first plan"}
       </TaskButton>
     </div>
   );
@@ -680,7 +710,9 @@ export function shouldLoadTasks(
   planId: string,
 ) {
   return (
-    view === "board" || view === "list" || (view === "plans" && Boolean(planId))
+    view === "board" ||
+    view === "list" ||
+    (view === "plans" && Boolean(planId) && planId !== ACTIVE_PLANS_FILTER)
   );
 }
 

@@ -42,7 +42,7 @@ Storage writes use a temporary file plus rename and mutations run under a cross-
 ## Interfaces
 
 - HTTP plans: `/api/plans`; task payloads and filters use `planId`.
-- MCP tools use `*_plan` names, including `list_plans`, `get_plan`, `create_plan`, `update_plan`, `archive_plan`, and `restore_plan`.
+- MCP tools use `*_plan` names, including `list_plans`, `get_plan`, `create_plan`, `update_plan`, `archive_plan`, and `restore_plan`. `get_plan`, `get_task`, and `get_subtask` accept one `id` or issue `key`; mutations continue to require IDs and current revisions.
 - `taskdroid ui` hosts one discovered project. Project discovery walks upward until `.taskdroid/project.json` exists.
 
 ## Dashboard behavior

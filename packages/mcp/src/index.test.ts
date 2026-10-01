@@ -34,6 +34,9 @@ describe("MCP contract", () => {
         expect.arrayContaining(["get_project", "get_workflow"]),
       );
       expect(tools.tools.map((tool) => tool.name)).toEqual(
+        expect.arrayContaining(["get_plan", "get_task", "get_subtask"]),
+      );
+      expect(tools.tools.map((tool) => tool.name)).toEqual(
         expect.arrayContaining([
           "list_documents",
           "get_document",
@@ -72,10 +75,60 @@ describe("MCP contract", () => {
         arguments: { title: "MCP Plan", tasks: [{ title: "Task", effort: 5 }] },
       });
       expect(created.isError).not.toBe(true);
+      const plan = (await service.listPlans())[0];
+      const planByKey = await client.callTool({
+        name: "get_plan",
+        arguments: { key: plan.key },
+      });
+      expect(planByKey.isError).not.toBe(true);
+      expect(JSON.stringify(planByKey.content)).toContain(plan.key);
+      const planById = await client.callTool({
+        name: "get_plan",
+        arguments: { id: plan.id },
+      });
+      expect(planById.isError).not.toBe(true);
       const task = (await service.listTasks())[0];
+      const taskByKey = await client.callTool({
+        name: "get_task",
+        arguments: { key: task.key },
+      });
+      expect(taskByKey.isError).not.toBe(true);
+      expect(JSON.stringify(taskByKey.content)).toContain(task.key);
+      const taskById = await client.callTool({
+        name: "get_task",
+        arguments: { id: task.id },
+      });
+      expect(taskById.isError).not.toBe(true);
+      const createdSubtask = await client.callTool({
+        name: "create_subtask",
+        arguments: {
+          taskId: task.id,
+          expectedRevision: task.revision,
+          subtask: { title: "MCP child", effort: 2 },
+        },
+      });
+      expect(createdSubtask.isError).not.toBe(true);
+      const updatedTask = await service.getTask(task.id);
+      const subtask = updatedTask.subtasks[0];
+      const subtaskByKey = await client.callTool({
+        name: "get_subtask",
+        arguments: { key: subtask.key },
+      });
+      expect(subtaskByKey.isError).not.toBe(true);
+      expect(JSON.stringify(subtaskByKey.content)).toContain(subtask.key);
+      const subtaskById = await client.callTool({
+        name: "get_subtask",
+        arguments: { id: subtask.id },
+      });
+      expect(subtaskById.isError).not.toBe(true);
+      const invalidLookup = await client.callTool({
+        name: "get_task",
+        arguments: { id: task.id, key: task.key },
+      });
+      expect(invalidLookup.isError).toBe(true);
       await client.callTool({
         name: "claim_task",
-        arguments: { id: task.id, expectedRevision: task.revision },
+        arguments: { id: task.id, expectedRevision: updatedTask.revision },
       });
       expect((await service.getTask(task.id)).statusId).toBe("in-progress");
     } finally {

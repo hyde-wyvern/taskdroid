@@ -3,7 +3,11 @@
   "version": "0.1.0",
   "type": "module",
   "bin": { "taskdroid": "dist/index.js" },
-  "scripts": { "build": "tsc -b", "typecheck": "tsc -b --pretty false" },
+  "files": ["dist"],
+  "scripts": {
+    "build": "npm run build -w @taskdroid/web && node scripts/clean-dist.mjs && tsc -b && node scripts/copy-web-assets.mjs",
+    "typecheck": "tsc -b --pretty false"
+  },
   "dependencies": {
     "@taskdroid/core": "0.1.0",
     "@taskdroid/mcp": "0.1.0",

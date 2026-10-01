@@ -40,6 +40,8 @@ Use search and status filters to narrow visible work. A plan's progress is based
 
 Create a plan for an outcome and add its high-level tasks. Keep task status independent from plan status. When a task needs smaller steps, write a detailed plan and split it into subtasks. Subtasks are the leaves of the hierarchy; nesting stops there. Archive removes an item from active views without deleting its record, and restore brings it back.
 
+Plans, tasks, and subtasks receive unique project-wide issue keys. Agents can fetch any of them directly by key with the MCP getters described in the [Agent and MCP Guide](agent-mcp-guide.md).
+
 Use the Project view to edit `description.md`, `architecture.md`, and `agents.md`. These documents belong to this project and are distinct from the repository's root `AGENTS.md`.
 
 ## Local data and backups

@@ -10,6 +10,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 import { api } from "./api";
 import { renderWithMantine } from "./testUtils";
+import { ACTIVE_PLANS_FILTER } from "./WorkFilters";
 import type { Plan, Project, Task, Workflow } from "./types";
 
 const workflow: Workflow = {
@@ -192,6 +193,89 @@ describe("App navigation and selected-plan state", () => {
     expect(
       await screen.findByRole("heading", { name: "Welcome to Taskdroid" }),
     ).toBeTruthy();
+  });
+
+  it("defaults to active plans and excludes tasks from other plans", async () => {
+    const activeWorkflow: Workflow = {
+      ...workflow,
+      startStatusId: "in-progress",
+      statuses: [
+        ...workflow.statuses,
+        {
+          id: "in-progress",
+          name: "In Progress",
+          color: "#f59e0b",
+          completed: false,
+        },
+      ],
+    };
+    const activePlan = { ...plan, statusId: "in-progress" };
+    const backlogPlan = {
+      ...plan,
+      id: "backlog-plan",
+      title: "Backlog plan",
+      statusId: "backlog",
+    };
+    const activeTask = {
+      ...task,
+      id: "active-task",
+      planId: activePlan.id,
+      title: "Active task",
+      statusId: "in-progress",
+    };
+    const backlogTask = {
+      ...task,
+      id: "backlog-task",
+      planId: backlogPlan.id,
+      title: "Backlog task",
+      statusId: "in-progress",
+    };
+    vi.stubGlobal(
+      "EventSource",
+      class {
+        close = vi.fn();
+        addEventListener = vi.fn();
+      },
+    );
+    vi.spyOn(api, "project").mockResolvedValue({
+      ...project,
+      workflow: activeWorkflow,
+    });
+    vi.spyOn(api, "plans").mockResolvedValue([activePlan, backlogPlan]);
+    vi.spyOn(api, "tasks").mockResolvedValue([activeTask, backlogTask]);
+
+    renderWithMantine(<App />);
+
+    const planFilter = await screen.findByRole("combobox", {
+      name: "Plan filter",
+    });
+    expect(planFilter).toHaveProperty("value", ACTIVE_PLANS_FILTER);
+    expect(
+      await screen.findByRole("button", { name: /Active task/ }),
+    ).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /Backlog task/ })).toBeNull();
+    expect(api.tasks).toHaveBeenCalledWith(undefined);
+  });
+
+  it("explains when plans exist but none are in the active status", async () => {
+    const backlogPlan = { ...plan, statusId: "backlog" };
+    vi.stubGlobal(
+      "EventSource",
+      class {
+        close = vi.fn();
+        addEventListener = vi.fn();
+      },
+    );
+    vi.spyOn(api, "project").mockResolvedValue(project);
+    vi.spyOn(api, "plans").mockResolvedValue([backlogPlan]);
+    vi.spyOn(api, "tasks").mockResolvedValue([]);
+
+    renderWithMantine(<App />);
+
+    expect(
+      await screen.findByRole("heading", { name: "No active plans" }),
+    ).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Create a plan" })).toBeTruthy();
   });
 
   it("keeps accessible view selection and plan filtering in sync", async () => {
