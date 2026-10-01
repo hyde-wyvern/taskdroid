@@ -1,18 +1,28 @@
 {
-  "name": "@taskdroid/cli",
+  "name": "@culto/taskdroid",
+  "description": "Local-first task planning and work tracking CLI for people and AI agents.",
   "version": "0.1.0",
+  "author": "Culto",
+  "license": "GPL-3.0-or-later",
+  "repository": { "type": "git", "url": "https://github.com/hyde-wyvern/taskdroid.git", "directory": "packages/cli" },
+  "homepage": "https://github.com/hyde-wyvern/taskdroid#readme",
+  "bugs": { "url": "https://github.com/hyde-wyvern/taskdroid/issues" },
+  "engines": { "node": ">=22" },
   "type": "module",
   "bin": { "taskdroid": "dist/index.js" },
-  "files": ["dist"],
+  "files": ["dist", "README.md", "LICENSE"],
   "scripts": {
-    "build": "npm run build -w @taskdroid/web && node scripts/clean-dist.mjs && tsc -b && node scripts/copy-web-assets.mjs",
-    "typecheck": "tsc -b --pretty false"
+    "build": "npm run build -w @culto/taskdroid-web && node scripts/clean-dist.mjs && tsc -b && node scripts/copy-web-assets.mjs",
+    "typecheck": "tsc -b --pretty false",
+    "prepack": "node ../../scripts/prepare-workspace-pack.mjs",
+    "postpack": "node ../../scripts/cleanup-workspace-pack.mjs"
   },
   "dependencies": {
-    "@taskdroid/core": "0.1.0",
-    "@taskdroid/mcp": "0.1.0",
-    "@taskdroid/server": "0.1.0",
+    "@culto/taskdroid-core": "0.1.0",
+    "@culto/taskdroid-mcp": "0.1.0",
+    "@culto/taskdroid-server": "0.1.0",
     "commander": "^14.0.1",
     "open": "^10.2.0"
-  }
+  },
+  "publishConfig": { "access": "public" }
 }

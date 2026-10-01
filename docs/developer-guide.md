@@ -31,9 +31,9 @@ npm run lint
 npm run build
 ```
 
-`npm run validate` runs typecheck, tests, and build. Lint is a separate gate, so run `npm run lint` as well. The web workspace can be built independently with `npm run build -w @taskdroid/web`.
+`npm run validate` runs typecheck, tests, and build. Lint is a separate gate, so run `npm run lint` as well. The web workspace can be built independently with `npm run build -w @culto/taskdroid-web`.
 
-`npm run build -w @taskdroid/cli` builds the private web workspace, compiles the CLI, then copies the Vite output into `packages/cli/dist/web`. The CLI package publishes `dist` only; keep dashboard source and the separate `@taskdroid/web` workspace private.
+`npm run build -w @culto/taskdroid` builds the private `@culto/taskdroid-web` workspace, compiles the CLI, then copies the Vite output into `packages/cli/dist/web`. The CLI package publishes `dist` only; keep dashboard source and the web workspace private.
 
 Keep changes scoped to the owning package. Add focused tests for domain, API, and dashboard behavior. Preserve revision checks, cross-process locking, schema validation, and atomic storage writes. Do not edit `.taskdroid/` JSON directly when working in a Taskdroid project; use the service or MCP tools.
 

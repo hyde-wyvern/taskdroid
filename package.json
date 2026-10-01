@@ -5,7 +5,7 @@
   "type": "module",
   "workspaces": ["packages/*"],
   "scripts": {
-    "build": "npm run build -w @taskdroid/core && npm run build -w @taskdroid/server && npm run build -w @taskdroid/mcp && npm run build -w @taskdroid/cli",
+    "build": "npm run build -w @culto/taskdroid-core && npm run build -w @culto/taskdroid-server && npm run build -w @culto/taskdroid-mcp && npm run build -w @culto/taskdroid",
     "test": "vitest run",
     "typecheck": "tsc -b",
     "lint": "eslint .",

@@ -1,24 +1,29 @@
 #!/usr/bin/env node
 import { Command } from "commander";
+import { readFileSync } from "node:fs";
 import { basename } from "node:path";
 import open from "open";
 import {
   findProjectRoot,
   TaskdroidError,
   TaskdroidService,
-} from "@taskdroid/core";
-import { createApp } from "@taskdroid/server";
-import { runMcpServer } from "@taskdroid/mcp";
+} from "@culto/taskdroid-core";
+import { createApp } from "@culto/taskdroid-server";
+import { runMcpServer } from "@culto/taskdroid-mcp";
 import {
   confirmManagedInstructions,
   writeManagedInstructions,
 } from "./agentInstructions.js";
 import { resolveWebRoot } from "./webAssets.js";
 
+const { version } = JSON.parse(
+  readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+) as { version: string };
+
 const program = new Command()
   .name("taskdroid")
   .description("Local task management for AI agents")
-  .version("0.1.0");
+  .version(version);
 
 program
   .command("init")

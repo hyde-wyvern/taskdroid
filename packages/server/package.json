@@ -1,11 +1,25 @@
 {
-  "name": "@taskdroid/server",
+  "name": "@culto/taskdroid-server",
+  "description": "Local HTTP API and dashboard host for Taskdroid projects.",
   "version": "0.1.0",
+  "author": "Culto",
+  "license": "GPL-3.0-or-later",
+  "repository": { "type": "git", "url": "https://github.com/hyde-wyvern/taskdroid.git", "directory": "packages/server" },
+  "homepage": "https://github.com/hyde-wyvern/taskdroid#readme",
+  "bugs": { "url": "https://github.com/hyde-wyvern/taskdroid/issues" },
+  "engines": { "node": ">=22" },
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "exports": "./dist/index.js",
-  "scripts": { "build": "tsc -b", "typecheck": "tsc -b --pretty false" },
-  "dependencies": { "@taskdroid/core": "0.1.0", "express": "^5.1.0" },
-  "devDependencies": { "@types/express": "^5.0.3", "supertest": "^7.1.4", "@types/supertest": "^6.0.3" }
+  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
+  "files": ["dist", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b --pretty false",
+    "prepack": "node ../../scripts/prepare-workspace-pack.mjs",
+    "postpack": "node ../../scripts/cleanup-workspace-pack.mjs"
+  },
+  "dependencies": { "@culto/taskdroid-core": "0.1.0", "express": "^5.1.0" },
+  "devDependencies": { "@types/express": "^5.0.3", "supertest": "^7.1.4", "@types/supertest": "^6.0.3" },
+  "publishConfig": { "access": "public" }
 }

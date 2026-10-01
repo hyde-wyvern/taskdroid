@@ -11,7 +11,7 @@ git clone https://github.com/hyde-wyvern/taskdroid.git
 cd taskdroid
 npm install
 npm run build
-npm link -w @taskdroid/cli
+npm link -w @culto/taskdroid
 ```
 
 Create a separate project directory, then initialize and open its dashboard:

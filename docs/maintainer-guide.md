@@ -1,11 +1,11 @@
 # Maintainer and Release Guide
 
-This guide records the manual preview release gates for Taskdroid. There is no automated release script in the repository. Run the gates from the repository root and publish only after the artifacts have been inspected.
+Pull requests and pushes to `main` run GitHub CI. Pushing `v0.1.0` runs the guarded release workflow in `.github/workflows/release.yml`; it validates and publishes the four runtime packages, then creates a GitHub release. Do not push the release tag until the account, package permissions, and npm trusted publishers are ready.
 
 ## Pre-release checks
 
 1. Confirm the intended version and matching versions across publishable workspaces.
-2. Confirm that a root `LICENSE` file exists and that every published package declares the intended `GPL-3.0-or-later` license. The source snapshot may not yet contain those release artifacts.
+2. Confirm the root `LICENSE` matches GNU GPL v3 and that `@culto/taskdroid-core`, `@culto/taskdroid-server`, `@culto/taskdroid-mcp`, and `@culto/taskdroid` declare `GPL-3.0-or-later`, Node.js 22+, synchronized versions, and public npm access metadata. The `@culto/taskdroid-web` workspace must remain private.
 3. Run the repository gates:
 
    ```sh
@@ -16,19 +16,27 @@ This guide records the manual preview release gates for Taskdroid. There is no a
 4. Inspect package contents without publishing:
 
    ```sh
-   npm pack --workspace @taskdroid/core --dry-run
-   npm pack --workspace @taskdroid/server --dry-run
-   npm pack --workspace @taskdroid/mcp --dry-run
-   npm pack --workspace @taskdroid/cli --dry-run
+   npm pack --workspace @culto/taskdroid-core --dry-run
+   npm pack --workspace @culto/taskdroid-server --dry-run
+   npm pack --workspace @culto/taskdroid-mcp --dry-run
+   npm pack --workspace @culto/taskdroid --dry-run
    ```
 
-   `npm run build -w @taskdroid/cli` builds the private web workspace and copies its Vite output to `packages/cli/dist/web`. Confirm the CLI tarball contains `dist/web/index.html` and its referenced assets, declarations, README, and license. Confirm workspace source, project-local data, tests, and development-only files are excluded. The web workspace remains private.
+   `npm run build -w @culto/taskdroid` builds the private web workspace and copies its Vite output to `packages/cli/dist/web`. Confirm the CLI tarball contains `dist/web/index.html` and its referenced assets, declarations, README, and license. Confirm workspace source, project-local data, tests, and development-only files are excluded. The web workspace remains private.
 
-5. Verify npm ownership and public-scope publishing permission for `@taskdroid` before the first publication. Confirm the target package names and registry state with `npm view`.
+5. Verify npm ownership and public-scope publishing permission for `@culto` before the first publication. Check the signed-in account with `npm whoami --registry=https://registry.npmjs.org/` and confirm its organization role permits publishing. A 404 from a private configured registry does not establish public npm publish permission.
+
+## GitHub and npm permissions
+
+For npm trusted publishing, configure each public package (`@culto/taskdroid-core`, `@culto/taskdroid-server`, `@culto/taskdroid-mcp`, and `@culto/taskdroid`) in npm's package Settings → Trusted publishing to trust GitHub Actions from owner `hyde-wyvern`, repository `taskdroid`, workflow filename `release.yml`, with no GitHub environment configured. In Allowed actions, explicitly enable direct `npm publish` (not only `npm stage publish`). Repeat this for all four packages. The workflow grants `id-token: write` only to the release job, disables package-manager caching, and installs npm 11.5.1 or newer for OIDC publishing. GitHub release creation uses `contents: write`.
+
+Manual authentication fallback: if npm trusted publishing is unavailable, create an npm granular access token with read/write publish permission restricted to these four packages, then add it as the repository Actions secret `NPM_TOKEN`. The release workflow uses that secret only when present; otherwise it uses OIDC. Remove the fallback secret after the release. Never commit or print the token.
+
+The release job runs `scripts/check-packages.mjs` against the tag version before publishing. It publishes core, server, MCP, then CLI, and creates generated release notes/source archives only after all package publishes succeed. The `@culto/taskdroid-web` workspace remains private and is bundled into the CLI.
 
 ## Publish and smoke test
 
-Publish the runtime packages in dependency order: core, server and MCP, then CLI. Publish scoped packages publicly when required by the npm account configuration. Create a version tag and GitHub release only after registry artifacts are available.
+The tagged workflow performs publication in dependency order. When using the token fallback, add `NPM_TOKEN` before pushing the release tag; the same workflow then publishes and creates the GitHub release. Do not manually publish packages and also trigger the automatic release workflow for the same version.
 
 From a clean temporary directory and a Node.js 22+ environment, install the packed runtime tarballs, initialize a project, start the dashboard, and confirm `/` serves the packaged HTML, its hashed JavaScript/CSS assets load, and the API returns the initialized project. Configure an MCP client to launch `taskdroid mcp` with the test project as its working directory, then verify `get_project`, `get_workflow`, and direct `get_plan`, `get_task`, and `get_subtask` lookups by issue key, as well as ID-based mutations with current revisions. Finally run `taskdroid validate` against the clean project.
 

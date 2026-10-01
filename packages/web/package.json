@@ -1,5 +1,5 @@
 {
-  "name": "@taskdroid/web",
+  "name": "@culto/taskdroid-web",
   "version": "0.1.0",
   "private": true,
   "type": "module",

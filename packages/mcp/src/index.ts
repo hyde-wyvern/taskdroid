@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { TaskdroidError, TaskdroidService } from "@taskdroid/core";
+import { TaskdroidError, TaskdroidService } from "@culto/taskdroid-core";
 
 const effort = z.number().int().min(0).max(100);
 const taskInput = z.object({
@@ -288,17 +288,16 @@ export function createMcpServer(service: TaskdroidService): McpServer {
   return server;
 }
 
-// SDK callback generics do not preserve dynamic Zod shape inference through this wrapper.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ToolArguments<T extends z.ZodRawShape> = z.infer<z.ZodObject<T>>;
+
 function tool<T extends z.ZodRawShape>(
   server: McpServer,
   name: string,
   description: string,
   shape: T,
-  handler: (args: any) => Promise<unknown>,
+  handler: (args: ToolArguments<T>) => Promise<unknown>,
 ) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const callback = async (args: any) => {
+  const callback = async (args: ToolArguments<T>) => {
     try {
       return {
         content: [

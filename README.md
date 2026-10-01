@@ -19,13 +19,13 @@ git clone https://github.com/hyde-wyvern/taskdroid.git
 cd taskdroid
 npm install
 npm run build
-npm link -w @taskdroid/cli
+npm link -w @culto/taskdroid
 ```
 
 Once the package is published, the intended install command is:
 
 ```sh
-npm install --global @taskdroid/cli
+npm install --global @culto/taskdroid
 ```
 
 ## Quick start
@@ -63,4 +63,4 @@ Report bugs and request features in [GitHub Issues](https://github.com/hyde-wyve
 
 ## License
 
-The intended license is [GNU GPL v3.0 or later](https://www.gnu.org/licenses/gpl-3.0.html). This source snapshot does not yet include a root `LICENSE` file; add and verify the license artifact before publishing a release.
+Taskdroid is licensed under [GNU GPL v3.0 or later](LICENSE). Runtime package manifests declare `GPL-3.0-or-later`; each package tarball includes the license text.
