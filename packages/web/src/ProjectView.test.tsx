@@ -75,11 +75,30 @@ describe("ProjectView documents", () => {
     const documentPane = screen.getByRole("region", {
       name: "Project documents",
     });
+    const documentBrowser = documentPane.querySelector(".document-browser");
     const plansRail = screen.getByRole("complementary", {
       name: "Project plans",
     });
     expect(workspace?.classList.contains("project-workspace")).toBe(true);
     expect(documentPane.nextElementSibling).toBe(plansRail);
+    expect(screen.getByRole("heading", { name: "Documents" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Plans" })).toBeTruthy();
+    expect(
+      screen.queryByRole("heading", { name: project.name }),
+    ).toBeNull();
+    expect(documentBrowser?.querySelector('[role="tablist"]')).toBeTruthy();
+    expect(documentBrowser?.querySelector(".project-document")).toBeTruthy();
+    const addDocumentButton = screen.getByRole("button", {
+      name: "Add document",
+    });
+    expect(addDocumentButton.classList.contains("primary")).toBe(true);
+    expect(addDocumentButton.classList.contains("add-tab")).toBe(true);
+    expect(
+      screen.getByRole("heading", { name: "Documents" }).parentElement?.parentElement?.className,
+    ).toBe("view-heading");
+    expect(
+      screen.getByRole("heading", { name: "Plans" }).parentElement?.parentElement?.className,
+    ).toBe("view-heading");
     expect(screen.getByRole("button", { name: "Platform" })).toBeTruthy();
   });
 

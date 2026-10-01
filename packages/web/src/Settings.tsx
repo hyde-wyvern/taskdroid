@@ -70,6 +70,7 @@ export function Settings({
         Backlog.
       </p>
       <Select
+        className="settings-color-scheme"
         label="Color scheme"
         aria-label="Color scheme"
         value={colorScheme}
@@ -83,7 +84,7 @@ export function Settings({
             setColorScheme(value);
         }}
       />
-      <label>
+      <label className="settings-claimed-start">
         Claimed tasks start in
         <select
           value={startStatusId}

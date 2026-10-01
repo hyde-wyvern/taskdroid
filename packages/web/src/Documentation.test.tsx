@@ -8,4 +8,7 @@ it('documents concepts, CLI, and focused MCP document tools', () => {
   expect(screen.getByRole('heading', { name: 'Taskdroid documentation' })).toBeTruthy();
   expect(screen.getByText('list_documents, get_document, update_document')).toBeTruthy();
   expect(screen.getByText('taskdroid init --manage-agent-instructions')).toBeTruthy();
+  expect(screen.getByText(/\.taskdroid\/docs\/agents\.md/)).toBeTruthy();
+  expect(screen.getByText(/\.taskdroid\/docs\/architecture\.md/)).toBeTruthy();
+  expect(screen.getByText(/Move completed work to Ready for Review/)).toBeTruthy();
 });

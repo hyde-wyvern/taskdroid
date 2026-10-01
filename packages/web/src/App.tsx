@@ -9,6 +9,7 @@ import {
 import { api, ApiError } from "./api";
 import { Board } from "./Board";
 import { Documentation } from "./Documentation";
+import { Onboarding } from "./Onboarding";
 import { ListView } from "./ListView";
 import { PlanEditor } from "./PlanEditor";
 import { ProjectView } from "./ProjectView";
@@ -28,6 +29,52 @@ import { IconMoonStars, IconSun, IconX } from "@tabler/icons-react";
 import { IconAction, TaskButton } from "./Controls";
 import type { Plan, Progress, Project, Task, Workflow } from "./types";
 
+function DashboardLogo() {
+  const negativeSpace = "var(--taskdroid-surface-raised)";
+
+  return (
+    <svg
+      className="logo"
+      viewBox="0 0 1024 1024"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <rect
+        width="1024"
+        height="1024"
+        fill="var(--taskdroid-logo-background)"
+      />
+      <g transform="matrix(1,0,0,1,0,-98.833333)">
+        <g transform="matrix(1.536733,0,0,1.536733,-185.923657,26.84334)">
+          <circle cx="238.5" cy="455.5" r="56.5" fill={negativeSpace} />
+        </g>
+        <g transform="matrix(1.536733,0,0,1.536733,476.901785,26.84334)">
+          <circle cx="238.5" cy="455.5" r="56.5" fill={negativeSpace} />
+        </g>
+        <g transform="matrix(0.342613,0,0,0.273984,337.165171,614.513828)">
+          <path
+            d="M320,409.92L704,409.92C725.672,409.92 746.455,420.696 761.767,439.874C777.08,459.051 785.666,485.056 785.633,512.157C785.633,512.157 786.289,621.943 722.116,707.966C682.934,760.489 619.146,808.578 510.489,806.063C403.567,803.587 340.763,755.65 302.206,704.56C237.263,618.506 238.367,512.164 238.367,512.164C238.333,485.062 246.918,459.056 262.231,439.876C277.543,420.697 298.327,409.92 320,409.92Z"
+            fill={negativeSpace}
+          />
+        </g>
+        <g transform="matrix(1,0,0,1,0,98.833333)">
+          <rect y="320" width="1024" height="128" fill={negativeSpace} />
+          <g transform="matrix(1,0,0,1,0,-98.833333)">
+            <path
+              d="M448,482.833L576,482.833C587.797,482.833 598.432,489.94 602.946,500.838C607.461,511.737 604.966,524.282 596.624,532.624L532.624,596.624C521.234,608.014 502.766,608.014 491.376,596.624L427.376,532.624C419.034,524.282 416.539,511.737 421.054,500.838C425.568,489.94 436.203,482.833 448,482.833Z"
+              fill={negativeSpace}
+            />
+          </g>
+        </g>
+      </g>
+    </svg>
+  );
+}
+
+function onboardingStorageKey(projectId: string) {
+  return `taskdroid:onboarding:${projectId}`;
+}
+
 export function App() {
   return (
     <ToastProvider>
@@ -40,6 +87,11 @@ function TaskdroidApp() {
   const [route, setRoute] = useState(() => parseRoute(window.location.href));
   const view = route.view;
   const [project, setProject] = useState<Project>();
+  const [onboardingReadyFor, setOnboardingReadyFor] = useState<string>();
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingReturnRoute, setOnboardingReturnRoute] = useState<AppRoute>(
+    () => parseRoute(window.location.href),
+  );
   const [plans, setPlans] = useState<Plan[]>([]);
   const [plansLoaded, setPlansLoaded] = useState(false);
   const [planId, setPlanId] = useState(() =>
@@ -63,6 +115,7 @@ function TaskdroidApp() {
   const computedColorScheme = useComputedColorScheme("light");
   const { setColorScheme } = useMantineColorScheme();
   const toast = useToast();
+  const projectId = project?.id;
 
   const loadProject = useCallback(async () => {
     try {
@@ -129,8 +182,23 @@ function TaskdroidApp() {
     void loadProject();
   }, [loadProject]);
   useEffect(() => {
+    if (!projectId) return;
+    let completed = false;
+    try {
+      completed =
+        window.localStorage.getItem(onboardingStorageKey(projectId)) ===
+        "complete";
+    } catch {
+      completed = false;
+    }
+    setShowOnboarding((current) => current || !completed);
+    setOnboardingReadyFor(projectId);
+  }, [projectId]);
+  useEffect(() => {
+    if (!projectId || onboardingReadyFor !== projectId || showOnboarding)
+      return;
     void loadTasks();
-  }, [loadTasks]);
+  }, [loadTasks, onboardingReadyFor, projectId, showOnboarding]);
   const updateRoute = useCallback((next: AppRoute, replace = false) => {
     const url = serializeRoute(next);
     const current = `${window.location.pathname}${window.location.search}`;
@@ -310,12 +378,38 @@ function TaskdroidApp() {
       subtaskStatusIds: null,
     });
   }
+  function openOnboarding() {
+    setOnboardingReturnRoute(route);
+    setShowOnboarding(true);
+  }
+  function continueOnboarding() {
+    if (project) {
+      try {
+        window.localStorage.setItem(
+          onboardingStorageKey(project.id),
+          "complete",
+        );
+      } catch {
+        // The current visit can continue when browser storage is unavailable.
+      }
+    }
+    setShowOnboarding(false);
+    updateRoute(onboardingReturnRoute, true);
+  }
 
   return (
     <div className="shell">
       <header className="app-header">
         <div>
-          <span className="logo">TD</span>
+          <button
+            type="button"
+            className="logo-button"
+            aria-label="Open Taskdroid onboarding"
+            title="Open Taskdroid onboarding"
+            onClick={openOnboarding}
+          >
+            <DashboardLogo />
+          </button>
           <h1>{project?.name ?? "Taskdroid"}</h1>
         </div>
         <nav className="primary-navigation" aria-label="Primary navigation">
@@ -412,83 +506,61 @@ function TaskdroidApp() {
         </div>
       )}
       <main>
-        {view === "documentation" ? (
-          <Documentation />
-        ) : view === "settings" && project ? (
-          <Settings
-            workflow={project.workflow}
-            onSaved={loadProject}
-            onError={(cause) => setError(message(cause))}
-          />
-        ) : view === "plans" && project ? (
-          <>
-            <WorkFilters
-              plans={plans}
-              planId=""
+        {project && onboardingReadyFor === project.id ? (
+          showOnboarding ? (
+            <Onboarding onContinue={continueOnboarding} />
+          ) : view === "documentation" ? (
+            <Documentation />
+          ) : view === "settings" && project ? (
+            <Settings
               workflow={project.workflow}
-              progress={dashboardProgress}
-              values={filters}
-              onPlanChange={() => undefined}
-              onChange={setFilters}
-              onClear={clearFilters}
-              projectOnly
+              onSaved={loadProject}
+              onError={(cause) => setError(message(cause))}
             />
-            <ProjectView
-              project={project}
-              plans={dashboardPlans}
-              workflow={project.workflow}
-              activeDocumentName={route.documentName}
-              onDocumentChange={(name) =>
-                updateRoute({ ...route, documentName: name })
-              }
-              onSelect={(selected) => openPlan(selected.id)}
-              onCreate={() => {
-                setPlanId("");
-                setEditingPlan(true);
-              }}
-              onMove={async (selected, statusId) => {
-                try {
-                  await api.movePlan(selected, statusId);
-                  await loadProject();
-                  toast("Plan status updated");
-                } catch (cause) {
-                  setError(message(cause));
+          ) : view === "plans" && project ? (
+            <>
+              <WorkFilters
+                plans={plans}
+                planId=""
+                workflow={project.workflow}
+                progress={dashboardProgress}
+                values={filters}
+                onPlanChange={() => undefined}
+                onChange={setFilters}
+                onClear={clearFilters}
+                projectOnly
+              />
+              <ProjectView
+                project={project}
+                plans={dashboardPlans}
+                workflow={project.workflow}
+                activeDocumentName={route.documentName}
+                onDocumentChange={(name) =>
+                  updateRoute({ ...route, documentName: name })
                 }
-              }}
-              onSave={async (documents) => {
-                await api.updateProjectDocuments(project, documents);
-                await loadProject();
-              }}
-              onError={(cause) => setError(message(cause))}
-            />
-          </>
-        ) : view === "list" && project ? (
-          <>
-            <WorkFilters
-              plans={plans}
-              planId={planId}
-              workflow={project.workflow}
-              progress={visibleProgress}
-              values={filters}
-              onPlanChange={setPlanId}
-              onChange={setFilters}
-              onClear={clearFilters}
-            />
-            <ListView
-              plans={visiblePlans}
-              tasks={visibleTasks}
-              workflow={project.workflow}
-              subtaskStatusIds={filters.subtaskStatusIds}
-              onSelectPlan={(selected) => openPlan(selected.id)}
-              onSelectTask={(task) => openTask(task)}
-              onSelectSubtask={(task, subtaskId) => openTask(task, subtaskId)}
-              onChanged={refresh}
-              onError={(cause) => setError(message(cause))}
-            />
-          </>
-        ) : (
-          <>
-            {view === "board" && project && (
+                onSelect={(selected) => openPlan(selected.id)}
+                onCreate={() => {
+                  setPlanId("");
+                  setEditingPlan(true);
+                }}
+                onMove={async (selected, statusId) => {
+                  try {
+                    await api.movePlan(selected, statusId);
+                    await loadProject();
+                    toast("Plan status updated");
+                  } catch (cause) {
+                    setError(message(cause));
+                  }
+                }}
+                onSave={async (documents) => {
+                  await api.updateProjectDocuments(project, documents);
+                  await loadProject();
+                }}
+                onError={(cause) => setError(message(cause))}
+              />
+            </>
+          ) : view === "list" && project ? (
+            <>
               <WorkFilters
                 plans={plans}
                 planId={planId}
@@ -499,23 +571,55 @@ function TaskdroidApp() {
                 onChange={setFilters}
                 onClear={clearFilters}
               />
-            )}
-            {project && visiblePlans.length ? (
-              <Board
-                planId={planId || undefined}
-                workflow={project.workflow}
+              <ListView
+                plans={visiblePlans}
                 tasks={visibleTasks}
-                onSelect={(task) => openTask(task)}
+                workflow={project.workflow}
+                subtaskStatusIds={filters.subtaskStatusIds}
+                onSelectPlan={(selected) => openPlan(selected.id)}
+                onSelectTask={(task) => openTask(task)}
+                onSelectSubtask={(task, subtaskId) => openTask(task, subtaskId)}
                 onChanged={refresh}
                 onError={(cause) => setError(message(cause))}
               />
-            ) : (
-              <Empty create={() => setEditingPlan(true)} />
-            )}
-          </>
-        )}
+            </>
+          ) : (
+            <>
+              {view === "board" && project && (
+                <WorkFilters
+                  plans={plans}
+                  planId={planId}
+                  workflow={project.workflow}
+                  progress={visibleProgress}
+                  values={filters}
+                  onPlanChange={setPlanId}
+                  onChange={setFilters}
+                  onClear={clearFilters}
+                />
+              )}
+              {project && visiblePlans.length ? (
+                <Board
+                  planId={planId || undefined}
+                  workflow={project.workflow}
+                  tasks={visibleTasks}
+                  onSelect={(task) => openTask(task)}
+                  onChanged={refresh}
+                  onError={(cause) => setError(message(cause))}
+                />
+              ) : (
+                <Empty create={() => setEditingPlan(true)} />
+              )}
+            </>
+          )
+        ) : null}
       </main>
-      {editingPlan && project && (
+      <footer className="app-footer">
+        <span>{new Date().getFullYear()} Developed by Culto</span>
+        <a href="https://www.gnu.org/licenses/gpl-3.0.html">
+          GNU GPL v3.0 or later
+        </a>
+      </footer>
+      {!showOnboarding && editingPlan && project && (
         <PlanEditor
           plan={plan}
           tasks={tasks}
@@ -530,7 +634,7 @@ function TaskdroidApp() {
           onError={(cause) => setError(message(cause))}
         />
       )}
-      {selectedTask && project && (
+      {!showOnboarding && selectedTask && project && (
         <TaskEditor
           key={selectedTask.id}
           task={selectedTask}

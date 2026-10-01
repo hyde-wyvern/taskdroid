@@ -58,6 +58,10 @@ export const taskdroidCssVariablesResolver: CSSVariablesResolver = () => ({
     "--taskdroid-focus-ring": "var(--mantine-color-taskdroid-6)",
   },
   light: {
+    "--taskdroid-logo-background": "#2f64d6",
+    "--taskdroid-primary-background": "#2f64d6",
+    "--taskdroid-primary-foreground": "#ffffff",
+    "--taskdroid-primary-hover": "#2758c0",
     "--taskdroid-app-background": "#f4f6f9",
     "--taskdroid-surface": "#ffffff",
     "--taskdroid-surface-raised": "#ffffff",
@@ -80,6 +84,10 @@ export const taskdroidCssVariablesResolver: CSSVariablesResolver = () => ({
     "--taskdroid-shadow-dialog": "0 20px 60px rgb(0 0 0 / 31%)",
   },
   dark: {
+    "--taskdroid-logo-background": "#ffffff",
+    "--taskdroid-primary-background": "#2f64d6",
+    "--taskdroid-primary-foreground": "#ffffff",
+    "--taskdroid-primary-hover": "#2758c0",
     "--taskdroid-app-background": "#18122b",
     "--taskdroid-surface": "#241d3b",
     "--taskdroid-surface-raised": "#393053",

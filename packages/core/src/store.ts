@@ -38,7 +38,7 @@ export class JsonStore {
     ]);
     await store.writeJson('project.json', project);
     await store.writeJson('workflow.json', workflow);
-    await Promise.all(['description.md', 'architecture.md', 'AGENTS.md'].map((file) => store.writeText(`docs/${file}`, '')));
+    await Promise.all(['description.md', 'architecture.md', 'agents.md'].map((file) => store.writeText(`docs/${file}`, '')));
     return store;
   }
 

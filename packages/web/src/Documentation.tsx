@@ -17,8 +17,21 @@ export function Documentation() {
     </dl></section>
     <section><h3>Dashboard workflow</h3><ol><li>Create a plan from Project view and add high-level tasks.</li><li>Use Board for active work or List for all hierarchy levels.</li><li>Add detailed task plans and subtasks when work needs slicing.</li><li>Use Settings to manage workflow statuses and claim start status.</li></ol><p>Progress uses active leaf effort. Sliced task effort derives from active subtasks.</p></section>
     <section><h3>CLI</h3><pre><code>taskdroid init --name "My project"{`\n`}taskdroid ui{`\n`}taskdroid mcp{`\n`}taskdroid validate</code></pre><p><code>taskdroid ui</code> serves current project at <code>127.0.0.1:4317</code> by default.</p></section>
-    <section><h3>MCP workflow</h3><ol><li>Call <code>get_project</code> and <code>get_workflow</code>.</li><li>Call <code>list_documents</code>, then read <code>AGENTS.md</code> with <code>get_document</code>.</li><li>Create or inspect a plan, then claim a task.</li><li>Use <code>plan_task</code> for detailed Markdown and structured subtasks.</li><li>Move work until Closed.</li></ol><p>Mutations require current <code>expectedRevision</code>. Re-fetch after conflicts; never edit `.taskdroid/` JSON directly.</p></section>
+    <section>
+      <h3>MCP workflow</h3>
+      <ol>
+        <li>Call <code>get_project</code> and <code>get_workflow</code>.</li>
+        <li>Call <code>list_documents</code>, then read <code>agents.md</code> and <code>architecture.md</code> with <code>get_document</code>.</li>
+        <li>Create or inspect a plan, then claim a task.</li>
+        <li>Use <code>plan_task</code> for detailed Markdown and structured subtasks.</li>
+        <li>Move completed work to Ready for Review.</li>
+      </ol>
+      <p>Mutations require current <code>expectedRevision</code>. Re-fetch after conflicts; never edit <code>.taskdroid/</code> JSON directly.</p>
+    </section>
     <section><h3>MCP tools</h3><div className="documentation-tools">{groups.map(([group, tools]) => <div key={group}><b>{group}</b><code>{tools}</code></div>)}</div></section>
-    <section><h3>Agent instructions and docs</h3><p>Interactive initialization can create a root <code>AGENTS.md</code> pointer. Project Markdown files live in <code>.taskdroid/docs/</code>; edit them from Project view or with <code>update_document</code>.</p><p>Use <code>taskdroid init --manage-agent-instructions</code> for non-interactive setup.</p></section>
+    <section><h3>Agent instructions and docs</h3>
+      <p>Interactive initialization can create a root <code>AGENTS.md</code> pointer. Project guidance lives in <code>.taskdroid/docs/agents.md</code> and technical architecture in <code>.taskdroid/docs/architecture.md</code>. Edit project Markdown from Project view or with <code>update_document</code>.</p>
+      <p>Use <code>taskdroid init --manage-agent-instructions</code> for non-interactive setup.</p>
+    </section>
   </article>;
 }

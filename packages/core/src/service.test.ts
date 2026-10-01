@@ -91,11 +91,11 @@ describe('TaskdroidService', () => {
   it('reads and updates individual project documents with revisions', async () => {
     const app = await service();
     const project = await app.getProject();
-    expect(await app.listDocuments()).toContain('AGENTS.md');
-    const updated = await app.updateDocument('AGENTS.md', '# Agent rules', project.revision);
+    expect(await app.listDocuments()).toEqual(expect.arrayContaining(['agents.md', 'architecture.md']));
+    const updated = await app.updateDocument('agents.md', '# Agent rules', project.revision);
     expect(updated.projectRevision).toBe(project.revision + 1);
-    await expect(app.updateDocument('AGENTS.md', 'stale', project.revision)).rejects.toMatchObject({ code: 'REVISION_CONFLICT' });
-    expect(await app.getDocument('AGENTS.md')).toEqual({ name: 'AGENTS.md', content: '# Agent rules' });
+    await expect(app.updateDocument('agents.md', 'stale', project.revision)).rejects.toMatchObject({ code: 'REVISION_CONFLICT' });
+    expect(await app.getDocument('agents.md')).toEqual({ name: 'agents.md', content: '# Agent rules' });
   });
 
   it('validates workflow removals and replacement', async () => {

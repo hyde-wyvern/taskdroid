@@ -5,8 +5,14 @@ describe("Taskdroid theme", () => {
   it("defines semantic light and dark tokens", () => {
     const variables = taskdroidCssVariablesResolver(undefined as never);
     expect(taskdroidTheme.primaryColor).toBe("taskdroid");
+    expect(variables.light["--taskdroid-logo-background"]).toBe("#2f64d6");
+    expect(variables.light["--taskdroid-primary-background"]).toBe("#2f64d6");
+    expect(variables.light["--taskdroid-primary-foreground"]).toBe("#ffffff");
     expect(variables.light["--taskdroid-app-background"]).toBe("#f4f6f9");
     expect(variables.light["--taskdroid-text"]).toBe("#172033");
+    expect(variables.dark["--taskdroid-logo-background"]).toBe("#ffffff");
+    expect(variables.dark["--taskdroid-primary-background"]).toBe("#2f64d6");
+    expect(variables.dark["--taskdroid-primary-foreground"]).toBe("#ffffff");
     expect(variables.dark["--taskdroid-app-background"]).toBe("#18122b");
     expect(variables.dark["--taskdroid-surface-raised"]).toBe("#393053");
     expect(variables.dark["--taskdroid-surface-muted"]).toBe("#443c68");
@@ -20,6 +26,12 @@ describe("Taskdroid theme", () => {
       contrastRatio(
         variables.dark["--taskdroid-text"],
         variables.dark["--taskdroid-app-background"],
+      ),
+    ).toBeGreaterThanOrEqual(4.5);
+    expect(
+      contrastRatio(
+        variables.dark["--taskdroid-primary-foreground"],
+        variables.dark["--taskdroid-primary-background"],
       ),
     ).toBeGreaterThanOrEqual(4.5);
     expect(

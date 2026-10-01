@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { createPortal } from "react-dom";
 import { Notification } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 
@@ -28,11 +29,14 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={context}>
       {children}
-      <div className="toast-stack" aria-live="polite">
-        {toasts.map((toast) => (
-          <ToastMessage key={toast.id} toast={toast} onDismiss={dismiss} />
-        ))}
-      </div>
+      {createPortal(
+        <div className="toast-stack" aria-live="polite">
+          {toasts.map((toast) => (
+            <ToastMessage key={toast.id} toast={toast} onDismiss={dismiss} />
+          ))}
+        </div>,
+        document.body,
+      )}
     </ToastContext.Provider>
   );
 }

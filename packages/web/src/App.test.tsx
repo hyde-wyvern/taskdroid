@@ -6,7 +6,7 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 import { api } from "./api";
 import { renderWithMantine } from "./testUtils";
@@ -83,12 +83,117 @@ const task: Task = {
 
 afterEach(() => {
   cleanup();
+  window.localStorage.clear();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
   window.history.replaceState(null, "", "/");
 });
 
+const onboardingStorageKey = (projectId: string) =>
+  `taskdroid:onboarding:${projectId}`;
+
+beforeEach(() => {
+  window.localStorage.setItem(onboardingStorageKey(project.id), "complete");
+});
+
 describe("App navigation and selected-plan state", () => {
+  it("shows onboarding before a deep link and restores it for repeat visits", async () => {
+    window.localStorage.clear();
+    window.history.replaceState(null, "", "/list?detail=task%3Atask");
+    vi.stubGlobal(
+      "EventSource",
+      class {
+        close = vi.fn();
+        addEventListener = vi.fn();
+      },
+    );
+    vi.spyOn(api, "project").mockResolvedValue(project);
+    vi.spyOn(api, "plans").mockResolvedValue([plan]);
+    vi.spyOn(api, "tasks").mockResolvedValue([task]);
+
+    renderWithMantine(<App />);
+
+    expect(
+      await screen.findByRole("heading", { name: "Welcome to Taskdroid" }),
+    ).toBeTruthy();
+    expect(screen.queryByRole("heading", { name: "Linked task" })).toBeNull();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Continue to Taskdroid" }),
+    );
+    expect(
+      await screen.findByRole("heading", { name: "Linked task" }),
+    ).toBeTruthy();
+    expect(window.location.pathname + window.location.search).toBe(
+      "/list?detail=task%3Atask",
+    );
+    expect(window.localStorage.getItem(onboardingStorageKey(project.id))).toBe(
+      "complete",
+    );
+
+    cleanup();
+    renderWithMantine(<App />);
+    expect(
+      await screen.findByRole("heading", { name: "Linked task" }),
+    ).toBeTruthy();
+    expect(
+      screen.queryByRole("heading", { name: "Welcome to Taskdroid" }),
+    ).toBeNull();
+  });
+
+  it("shows onboarding separately for a different project in the same browser", async () => {
+    vi.stubGlobal(
+      "EventSource",
+      class {
+        close = vi.fn();
+        addEventListener = vi.fn();
+      },
+    );
+    vi.spyOn(api, "project").mockResolvedValue({
+      ...project,
+      id: "second-project",
+    });
+    vi.spyOn(api, "plans").mockResolvedValue([plan]);
+    vi.spyOn(api, "tasks").mockResolvedValue([]);
+
+    renderWithMantine(<App />);
+
+    expect(
+      await screen.findByRole("heading", { name: "Welcome to Taskdroid" }),
+    ).toBeTruthy();
+    expect(window.localStorage.getItem(onboardingStorageKey(project.id))).toBe(
+      "complete",
+    );
+    expect(
+      window.localStorage.getItem(onboardingStorageKey("second-project")),
+    ).toBeNull();
+  });
+
+  it("opens onboarding from the keyboard-accessible logo button", async () => {
+    vi.stubGlobal(
+      "EventSource",
+      class {
+        close = vi.fn();
+        addEventListener = vi.fn();
+      },
+    );
+    vi.spyOn(api, "project").mockResolvedValue(project);
+    vi.spyOn(api, "plans").mockResolvedValue([plan]);
+    vi.spyOn(api, "tasks").mockResolvedValue([]);
+
+    renderWithMantine(<App />);
+
+    const logoButton = await screen.findByRole("button", {
+      name: "Open Taskdroid onboarding",
+    });
+    expect(logoButton.tagName).toBe("BUTTON");
+    logoButton.focus();
+    expect(document.activeElement).toBe(logoButton);
+    fireEvent.click(logoButton);
+    expect(
+      await screen.findByRole("heading", { name: "Welcome to Taskdroid" }),
+    ).toBeTruthy();
+  });
+
   it("keeps accessible view selection and plan filtering in sync", async () => {
     vi.stubGlobal(
       "EventSource",
@@ -111,11 +216,29 @@ describe("App navigation and selected-plan state", () => {
     expect(
       screen.getByRole("navigation", { name: "Primary navigation" }),
     ).toBeTruthy();
+    expect(
+      document
+        .querySelector(".app-header svg.logo circle")
+        ?.getAttribute("fill"),
+    ).toBe("var(--taskdroid-surface-raised)");
     expect(boardTab.getAttribute("aria-pressed")).toBe("true");
     expect(listTab.getAttribute("aria-pressed")).toBe("false");
     await waitFor(() => expect(window.location.pathname).toBe("/board"));
+    const footer = screen.getByRole("contentinfo");
+    expect(footer.textContent).toContain(
+      `${new Date().getFullYear()} Developed by Culto`,
+    );
+    expect(
+      screen
+        .getByRole("link", { name: "GNU GPL v3.0 or later" })
+        .getAttribute("href"),
+    ).toBe("https://www.gnu.org/licenses/gpl-3.0.html");
+    expect(footer.textContent).not.toMatch(/copyright|©/i);
 
-    fireEvent.change(screen.getByRole("combobox", { name: "Plan filter" }), {
+    const planFilter = await screen.findByRole("combobox", {
+      name: "Plan filter",
+    });
+    fireEvent.change(planFilter, {
       target: { value: plan.id },
     });
     expect(window.location.search).toBe("");

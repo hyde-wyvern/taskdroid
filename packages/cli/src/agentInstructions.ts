@@ -9,9 +9,8 @@ This project uses Taskdroid.
 At session start, when Taskdroid MCP is available:
 
 1. Call \`list_documents\`.
-2. Read \`AGENTS.md\` with \`get_document\`.
-3. Read other relevant project documents, especially \`architecture.md\`.
-4. Follow these project-specific instructions.
+2. Read \`agents.md\` and \`architecture.md\` with \`get_document\`.
+3. Follow these project-specific instructions.
 
 Do not edit \`.taskdroid/\` JSON directly. Use Taskdroid MCP tools for work items and project documents.
 `;

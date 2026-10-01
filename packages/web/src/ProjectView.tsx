@@ -67,55 +67,57 @@ export function ProjectView({
   }
   return (
     <section className="project-view">
-      <div className="view-heading">
-        <div>
-          <h2>{project.name}</h2>
-        </div>
-      </div>
       <div className="project-workspace">
         <section
           className="project-documents-pane"
           aria-label="Project documents"
         >
-          <div className="document-tabs" role="tablist">
-            {names.map((name) => (
-              <div
-                className={`document-tab-item${active === name ? " active" : ""}`}
-                key={name}
-              >
-                <button
-                  role="tab"
-                  aria-selected={active === name}
-                  onClick={() => selectDocument(name)}
+          <div className="view-heading">
+            <div>
+              <h2>Documents</h2>
+            </div>
+          </div>
+          <div className="document-browser">
+            <div className="document-tabs" role="tablist">
+              {names.map((name) => (
+                <div
+                  className={`document-tab-item${active === name ? " active" : ""}`}
+                  key={name}
                 >
-                  {name}
-                </button>
-                {active === name && (
-                  <IconAction
-                    label="Edit document"
-                    icon={<IconPencil size={16} />}
-                    onClick={() => setDocumentDialog({ mode: "edit", name })}
-                  />
+                  <button
+                    role="tab"
+                    aria-selected={active === name}
+                    onClick={() => selectDocument(name)}
+                  >
+                    {name}
+                  </button>
+                  {active === name && (
+                    <IconAction
+                      label="Edit document"
+                      icon={<IconPencil size={16} />}
+                      onClick={() => setDocumentDialog({ mode: "edit", name })}
+                    />
+                  )}
+                </div>
+              ))}
+              <button
+                className="primary add-tab"
+                onClick={() => setDocumentDialog({ mode: "create" })}
+                aria-label="Add document"
+              >
+                +
+              </button>
+            </div>
+            {active && (
+              <div className="project-document">
+                {current ? (
+                  <MarkdownContent content={current} />
+                ) : (
+                  <p>Empty document</p>
                 )}
               </div>
-            ))}
-            <button
-              className="primary add-tab"
-              onClick={() => setDocumentDialog({ mode: "create" })}
-              aria-label="Add document"
-            >
-              +
-            </button>
+            )}
           </div>
-          {active && (
-            <div className="project-document">
-              {current ? (
-                <MarkdownContent content={current} />
-              ) : (
-                <p>Empty document</p>
-              )}
-            </div>
-          )}
         </section>
         <aside className="project-plans-rail" aria-label="Project plans">
           <PlansView

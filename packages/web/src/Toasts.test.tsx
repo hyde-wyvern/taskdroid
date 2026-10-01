@@ -18,6 +18,9 @@ describe("ToastProvider", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
     expect(screen.getByRole("status").textContent).toContain("Task saved");
+    expect(document.querySelector(".toast-stack")?.parentElement).toBe(
+      document.body,
+    );
     fireEvent.click(
       screen.getByRole("button", { name: "Dismiss notification" }),
     );
