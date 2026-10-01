@@ -30,7 +30,7 @@ Pull requests and pushes to `main` run GitHub CI. Pushing `v0.1.0` runs the guar
 
 ### First publication bootstrap
 
-The packages must exist before npm offers their per-package Trusted Publisher settings. For the initial `v0.1.0` publication, create a granular access token on npmjs.com with **Read and write (publish and stage)** permission restricted to the `@culto` scope or the four package names. Enable **Bypass two-factor authentication** for package publishing if the account or packages require 2FA. Store it as the repository Actions secret `NPM_TOKEN`; the release workflow fails fast if it is missing. Never commit or print the token.
+The packages must exist before npm offers their per-package Trusted Publisher settings. For the initial `v0.1.0` publication, create a granular access token on npmjs.com with **Read and write (publish and stage)** permission restricted to the `@culto` scope or the four package names. Enable **Bypass two-factor authentication** for package publishing if the account or packages require 2FA. Store it as the repository Actions secret `NPM_TOKEN`; the release workflow fails fast if it is missing. `actions/setup-node` configures the npmjs registry and `@culto` scope so `NODE_AUTH_TOKEN` is actually used; do not add an interactive `npm login` step to CI. Never commit or print the token.
 
 ### Trusted publishing after bootstrap
 
