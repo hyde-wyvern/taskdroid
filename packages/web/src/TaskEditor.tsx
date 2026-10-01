@@ -9,6 +9,7 @@ import { DialogShell, IconAction, TaskButton } from "./Controls";
 import { EffortSelect } from "./EffortSelect";
 import { IssueKey } from "./IssueKey";
 import { StatusSelect } from "./StatusSelect";
+import { MarkdownEditor } from "./MarkdownEditor";
 import { SubtaskEditor } from "./SubtaskEditor";
 import { WorkItemViewer } from "./WorkItemViewer";
 import { api } from "./api";
@@ -24,6 +25,8 @@ export function TaskEditor({
   workflow,
   archived,
   onSelectPlan,
+  onSelectSubtask,
+  onReturnToTask,
   onClose,
   onSaved,
   onError,
@@ -34,6 +37,8 @@ export function TaskEditor({
   workflow: Workflow;
   archived: boolean;
   onSelectPlan: () => void;
+  onSelectSubtask?: (task: Task, subtaskId: string) => void;
+  onReturnToTask?: (task: Task) => void;
   onClose: () => void;
   onSaved: () => Promise<void>;
   onError: (error: unknown) => void;
@@ -56,6 +61,9 @@ export function TaskEditor({
   useEffect(() => {
     if (!editing) setTask(initial);
   }, [editing, initial]);
+  useEffect(() => {
+    setSelectedSubtaskId(initialSubtaskId);
+  }, [initialSubtaskId]);
   const activeSubtasks = sortByWorkPriority(
     task.subtasks.filter((item) => !item.archivedAt),
     workflow,
@@ -173,7 +181,10 @@ export function TaskEditor({
         workflow={workflow}
         archived={archived}
         onSelectPlan={onSelectPlan}
-        onSelectTask={() => setSelectedSubtaskId(undefined)}
+        onSelectTask={() => {
+          setSelectedSubtaskId(undefined);
+          onReturnToTask?.(task);
+        }}
         onClose={onClose}
         onTaskChanged={acceptTask}
         onError={onError}
@@ -224,7 +235,10 @@ export function TaskEditor({
                 <div key={subtask.id}>
                   <button
                     className={`subtask-link${isClosed(workflow, subtask.statusId) ? " closed-title" : ""}`}
-                    onClick={() => setSelectedSubtaskId(subtask.id)}
+                    onClick={() => {
+                      setSelectedSubtaskId(subtask.id);
+                      onSelectSubtask?.(task, subtask.id);
+                    }}
                   >
                     <IssueKey value={subtask.key} kind="subtask" />
                     {subtask.title}
@@ -302,12 +316,11 @@ export function TaskEditor({
           value={description}
           onChange={(event) => setDescription(event.target.value)}
         />
-        <Textarea
+        <MarkdownEditor
           label="Detailed plan (Markdown)"
-          rows={7}
           disabled={archived}
           value={plan}
-          onChange={(event) => setPlan(event.target.value)}
+          onChange={setPlan}
         />
         <NumberInput
           label="Effort points"

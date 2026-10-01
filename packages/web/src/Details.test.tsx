@@ -276,6 +276,10 @@ describe("detail dialogs", () => {
       target: { value: "Discarded plan" },
     });
     fireEvent.change(
+      screen.getByRole("textbox", { name: "Source plan (Markdown)" }),
+      { target: { value: "# Discarded source plan" } },
+    );
+    fireEvent.change(
       screen.getByRole("textbox", { name: "Viewer task title" }),
       { target: { value: "Discarded task" } },
     );
@@ -293,6 +297,9 @@ describe("detail dialogs", () => {
       "value",
       "Viewer plan",
     );
+    expect(
+      screen.getByRole("textbox", { name: "Source plan (Markdown)" }),
+    ).toHaveProperty("value", plan.sourcePlan);
     expect(
       screen.getByRole("textbox", { name: "Viewer task title" }),
     ).toHaveProperty("value", "Viewer task");
@@ -453,6 +460,10 @@ describe("detail dialogs", () => {
     fireEvent.change(screen.getByRole("textbox", { name: "Description" }), {
       target: { value: "Discarded description" },
     });
+    fireEvent.change(
+      screen.getByRole("textbox", { name: "Detailed plan (Markdown)" }),
+      { target: { value: "# Discarded subtask plan" } },
+    );
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
     expect(updateSubtask).not.toHaveBeenCalled();
@@ -466,16 +477,26 @@ describe("detail dialogs", () => {
       "value",
       "Subtask description",
     );
+    const planEditor = screen.getByRole("textbox", {
+      name: "Detailed plan (Markdown)",
+    });
+    expect(planEditor).toHaveProperty("value", keyedTask.subtasks[0].plan);
     expect(updateSubtask).not.toHaveBeenCalled();
     fireEvent.change(screen.getByRole("textbox", { name: "Title" }), {
       target: { value: "Saved subtask" },
+    });
+    fireEvent.change(planEditor, {
+      target: { value: "# Saved subtask plan" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
     await waitFor(() =>
       expect(updateSubtask).toHaveBeenCalledWith(
         keyedTask,
         "one",
-        expect.objectContaining({ title: "Saved subtask" }),
+        expect.objectContaining({
+          title: "Saved subtask",
+          plan: "# Saved subtask plan",
+        }),
       ),
     );
     await waitFor(() =>
@@ -500,15 +521,34 @@ describe("detail dialogs", () => {
       />,
     );
     fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    const planEditor = screen.getByRole("textbox", {
+      name: "Detailed plan (Markdown)",
+    });
+    fireEvent.change(planEditor, {
+      target: { value: "# Discarded task plan" },
+    });
+    expect(updateTask).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    expect(
+      screen.getByRole("textbox", { name: "Detailed plan (Markdown)" }),
+    ).toHaveProperty("value", task.plan);
     fireEvent.change(screen.getByRole("combobox", { name: "Task status" }), {
       target: { value: "closed" },
     });
+    fireEvent.change(
+      screen.getByRole("textbox", { name: "Detailed plan (Markdown)" }),
+      { target: { value: "# Saved task plan" } },
+    );
     expect(updateTask).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
     await waitFor(() =>
       expect(updateTask).toHaveBeenCalledWith(
         task,
-        expect.objectContaining({ statusId: "closed" }),
+        expect.objectContaining({
+          statusId: "closed",
+          plan: "# Saved task plan",
+        }),
       ),
     );
     await waitFor(() =>

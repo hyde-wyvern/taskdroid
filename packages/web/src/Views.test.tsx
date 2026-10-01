@@ -1,4 +1,5 @@
 import type { Plan, Task, Workflow } from "./types";
+import { MantineProvider } from "@mantine/core";
 import { afterEach, describe, expect, it, vi } from "vitest";
 // @vitest-environment jsdom
 import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
@@ -227,5 +228,67 @@ describe("project views", () => {
     );
     await waitFor(() => expect(move).toHaveBeenCalledWith(task, "todo"));
     expect(onChanged).toHaveBeenCalledOnce();
+  });
+
+  it("starts completed plans collapsed by default", () => {
+    const completedPlan = { ...plan, statusId: "closed" };
+    renderWithMantine(
+      <ListView
+        plans={[completedPlan]}
+        tasks={[task]}
+        workflow={workflow}
+        onSelectPlan={vi.fn()}
+        onSelectTask={vi.fn()}
+        onSelectSubtask={vi.fn()}
+        onChanged={vi.fn()}
+        onError={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByText("Queued work")).toBeNull();
+    expect(
+      screen.getByRole("button", { name: "Expand Platform plan" }),
+    ).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Expand Platform plan" }));
+    expect(screen.getByText("Queued work")).toBeTruthy();
+  });
+
+  it("collapses expanded task subtasks when the task becomes completed", async () => {
+    const { rerender } = renderWithMantine(
+      <ListView
+        plans={[plan]}
+        tasks={[task]}
+        workflow={workflow}
+        onSelectPlan={vi.fn()}
+        onSelectTask={vi.fn()}
+        onSelectSubtask={vi.fn()}
+        onChanged={vi.fn()}
+        onError={vi.fn()}
+      />,
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Expand Queued work subtasks" }),
+    );
+    expect(screen.getByText("Nested work")).toBeTruthy();
+
+    rerender(
+      <MantineProvider defaultColorScheme="light">
+        <ListView
+          plans={[plan]}
+          tasks={[{ ...task, statusId: "closed" }]}
+          workflow={workflow}
+          onSelectPlan={vi.fn()}
+          onSelectTask={vi.fn()}
+          onSelectSubtask={vi.fn()}
+          onChanged={vi.fn()}
+          onError={vi.fn()}
+        />
+      </MantineProvider>,
+    );
+
+    await waitFor(() => expect(screen.queryByText("Nested work")).toBeNull());
+    expect(
+      screen.getByRole("button", { name: "Expand Queued work subtasks" }),
+    ).toBeTruthy();
   });
 });

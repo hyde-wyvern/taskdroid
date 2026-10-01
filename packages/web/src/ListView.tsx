@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TextInput } from "@mantine/core";
 import { IconChevronDown, IconChevronRight } from "@tabler/icons-react";
 import { api } from "./api";
@@ -35,10 +35,34 @@ export function ListView({
   const [creatingFor, setCreatingFor] = useState<string>();
   const [creatingSubtaskFor, setCreatingSubtaskFor] = useState<string>();
   const [expanded, setExpanded] = useState<string[]>([]);
+  const [expandedPlans, setExpandedPlans] = useState<string[]>([]);
   const [collapsedPlans, setCollapsedPlans] = useState<string[]>([]);
   const [title, setTitle] = useState("");
   const [effort, setEffort] = useState(1);
   const toast = useToast();
+
+  useEffect(() => {
+    const completedPlanIds = new Set(
+      plans
+        .filter((plan) => isComplete(workflow, plan.statusId))
+        .map((plan) => plan.id),
+    );
+    if (completedPlanIds.size) {
+      setExpandedPlans((current) =>
+        current.filter((planId) => !completedPlanIds.has(planId)),
+      );
+    }
+    const completedTaskIds = new Set(
+      tasks
+        .filter((task) => isComplete(workflow, task.statusId))
+        .map((task) => task.id),
+    );
+    if (completedTaskIds.size) {
+      setExpanded((current) =>
+        current.filter((taskId) => !completedTaskIds.has(taskId)),
+      );
+    }
+  }, [plans, tasks, workflow]);
 
   async function mutate(action: () => Promise<unknown>, success: string) {
     try {
@@ -96,12 +120,22 @@ export function ListView({
         : current.concat(taskId),
     );
   }
-  function togglePlan(planId: string) {
-    setCollapsedPlans((current) =>
-      current.includes(planId)
-        ? current.filter((id) => id !== planId)
-        : current.concat(planId),
-    );
+  function togglePlan(planId: string, completed: boolean) {
+    const isCollapsed =
+      collapsedPlans.includes(planId) ||
+      (completed && !expandedPlans.includes(planId));
+    if (isCollapsed) {
+      setCollapsedPlans((current) => current.filter((id) => id !== planId));
+      if (completed) {
+        setExpandedPlans((current) =>
+          current.includes(planId) ? current : current.concat(planId),
+        );
+      }
+    } else if (completed) {
+      setExpandedPlans((current) => current.filter((id) => id !== planId));
+    } else {
+      setCollapsedPlans((current) => current.concat(planId));
+    }
   }
 
   return (
@@ -112,7 +146,10 @@ export function ListView({
             tasks.filter((task) => task.planId === plan.id),
             workflow,
           );
-          const isCollapsed = collapsedPlans.includes(plan.id);
+          const isCollapsed =
+            collapsedPlans.includes(plan.id) ||
+            (isComplete(workflow, plan.statusId) &&
+              !expandedPlans.includes(plan.id));
           const totalSubtasks = planTasks.reduce(
             (sum, task) =>
               sum +
@@ -136,7 +173,9 @@ export function ListView({
                         <IconChevronDown size={16} />
                       )
                     }
-                    onClick={() => togglePlan(plan.id)}
+                    onClick={() =>
+                      togglePlan(plan.id, isComplete(workflow, plan.statusId))
+                    }
                   />
                   <h3>
                     <TaskButton
@@ -342,5 +381,13 @@ export function ListView({
         </div>
       )}
     </section>
+  );
+}
+
+function isComplete(workflow: Workflow, statusId: string) {
+  return workflow.statuses.some(
+    (status) =>
+      status.id === statusId &&
+      (status.completed || status.fixed === "closed"),
   );
 }

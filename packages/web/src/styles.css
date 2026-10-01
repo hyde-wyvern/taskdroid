@@ -78,33 +78,60 @@ button:disabled {
   text-decoration-thickness: 1.5px;
   text-decoration-color: currentColor;
 }
-header {
+.app-header {
   height: 64px;
   background: var(--taskdroid-surface-raised);
   border-bottom: 1px solid var(--taskdroid-border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: stretch;
   padding: 0 24px;
 }
-header > div,
-header nav {
+.app-header > div,
+.app-header nav {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-header h1 {
+.app-header h1 {
   font-size: 18px;
   margin: 0;
 }
-header nav button {
+.app-header .primary-navigation {
+  justify-content: center;
+  gap: 24px;
+}
+.app-header .primary-navigation > button {
   border: 0;
   border-radius: 0;
-  height: 64px;
+  height: 100%;
+  padding: 0 8px;
+  color: var(--taskdroid-text-muted);
+  background: transparent;
+  box-shadow: inset 0 -3px transparent;
 }
-header nav button.active {
-  color: #fff;
-  border-bottom: 3px solid #2f64d6;
+.app-header .primary-navigation > button:hover {
+  color: var(--taskdroid-text);
+  background: transparent;
+}
+.app-header .primary-navigation > button.active {
+  color: var(--taskdroid-text);
+  background: transparent;
+  box-shadow: inset 0 -3px var(--taskdroid-link);
+}
+.app-header .app-header-actions {
+  justify-content: flex-end;
+}
+.app-header .app-header-actions .mantine-Burger-root {
+  color: var(--taskdroid-text);
+}
+.header-menu-scheme {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  color: var(--taskdroid-text);
+  font-size: 14px;
 }
 .logo {
   display: grid;
@@ -118,15 +145,6 @@ header nav button.active {
 }
 main {
   padding: 22px 24px;
-}
-.toolbar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-.toolbar select {
-  min-width: 250px;
 }
 .work-filters {
   display: grid;
@@ -383,6 +401,8 @@ textarea {
   white-space: nowrap;
 }
 .detail-header {
+  display: flex;
+  justify-content: space-between;
   height: auto;
   min-height: 53px;
   padding: 0 0 15px;
@@ -450,7 +470,7 @@ textarea {
   gap: 8px;
   margin-top: 4px;
 }
-.dialog .mantine-Modal-body > footer span {
+.dialog .mantine-Modal-body > footer > span {
   flex: 1;
 }
 .form-grid {
@@ -634,23 +654,58 @@ textarea {
   margin: 0 auto;
 }
 .project-view {
-  max-width: 1100px;
+  max-width: 1400px;
   margin: 0 auto;
+}
+.project-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 24px;
+  align-items: start;
+}
+.project-documents-pane,
+.project-plans-rail {
+  min-width: 0;
+}
+.project-plans-rail .plans-view {
+  max-width: none;
+  margin: 0;
+}
+.project-plans-rail .plan-grid {
+  grid-template-columns: minmax(0, 1fr);
 }
 .document-tabs {
   display: flex;
-  gap: 5px;
+  gap: 6px;
   overflow-x: auto;
   margin: 0 0 10px;
 }
-.document-tabs button {
+.document-tab-item {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  border: 1px solid var(--taskdroid-border);
   border-radius: 7px 7px 0 0;
-  white-space: nowrap;
+  background: var(--taskdroid-surface);
 }
-.document-tabs button.active {
-  color: var(--taskdroid-link);
+.document-tab-item.active {
   border-color: var(--taskdroid-link);
   background: var(--taskdroid-selected-surface);
+}
+.document-tab-item > [role="tab"] {
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  white-space: nowrap;
+}
+.document-tab-item > [role="tab"]:hover,
+.document-tab-item > [role="tab"].active {
+  color: var(--taskdroid-link);
+  background: transparent;
+}
+.document-tab-item > button[aria-label="Edit document"] {
+  flex: 0 0 28px;
+  margin-right: 4px;
 }
 .document-tabs .add-tab {
   min-width: 38px;
@@ -727,6 +782,55 @@ textarea {
     SFMono-Regular,
     Menlo,
     monospace;
+}
+.markdown-editor-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.markdown-editor-label {
+  font-size: 13px;
+  font-weight: 600;
+}
+.markdown-editor .w-md-editor {
+  --color-canvas-default: var(--taskdroid-surface);
+  --color-canvas-subtle: var(--taskdroid-surface-muted);
+  --color-fg-default: var(--taskdroid-text);
+  --color-fg-muted: var(--taskdroid-text-muted);
+  --color-border-default: var(--taskdroid-border);
+  --color-neutral-muted: var(--taskdroid-surface-muted);
+  overflow: hidden;
+  color: var(--taskdroid-text);
+  background: var(--taskdroid-surface);
+  border: 1px solid var(--taskdroid-border);
+  border-radius: 6px;
+  box-shadow: none;
+}
+.markdown-editor .w-md-editor-toolbar {
+  color: var(--taskdroid-text);
+  background: var(--taskdroid-surface-muted);
+  border-bottom: 1px solid var(--taskdroid-border);
+}
+.markdown-editor .w-md-editor-toolbar li > button {
+  color: var(--taskdroid-text);
+}
+.markdown-editor .w-md-editor-toolbar li > button:hover,
+.markdown-editor .w-md-editor-toolbar li.active > button {
+  background: var(--taskdroid-surface-hover);
+}
+.markdown-editor .w-md-editor-text-pre,
+.markdown-editor .w-md-editor-text-input,
+.markdown-editor .w-md-editor-text > textarea {
+  color: var(--taskdroid-text);
+  background: var(--taskdroid-surface);
+}
+.markdown-editor .w-md-editor-preview {
+  color: var(--taskdroid-text);
+  background: var(--taskdroid-surface);
+  box-shadow: inset 1px 0 0 var(--taskdroid-border);
+}
+.markdown-editor .w-md-editor-text > textarea:focus {
+  outline-color: var(--taskdroid-focus-ring);
 }
 .details-view .markdown-content {
   padding: 13px;
@@ -832,12 +936,6 @@ textarea {
 .backlog-task-row > span {
   color: var(--taskdroid-text-muted);
   font-size: 12px;
-}
-.expand-button {
-  border: 0;
-  padding: 4px;
-  background: transparent;
-  font-size: 16px;
 }
 .task-link {
   border: 0;
@@ -1106,5 +1204,10 @@ textarea {
 @media (max-width: 900px) {
   .column {
     --column-width: 230px;
+  }
+}
+@media (max-width: 1100px) {
+  .project-workspace {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

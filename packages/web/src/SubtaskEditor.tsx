@@ -6,6 +6,7 @@ import type { Subtask, Task, Workflow } from "./types";
 import { DetailHeader } from "./DetailHeader";
 import { DialogShell, TaskButton } from "./Controls";
 import { StatusSelect } from "./StatusSelect";
+import { MarkdownEditor } from "./MarkdownEditor";
 import { WorkItemViewer } from "./WorkItemViewer";
 import { api } from "./api";
 import { isClosed } from "./isClosed";
@@ -187,11 +188,10 @@ export function SubtaskEditor({
           value={description}
           onChange={(event) => setDescription(event.target.value)}
         />
-        <Textarea
+        <MarkdownEditor
           label="Detailed plan (Markdown)"
-          rows={7}
           value={plan}
-          onChange={(event) => setPlan(event.target.value)}
+          onChange={setPlan}
         />
         <NumberInput
           label="Effort points"

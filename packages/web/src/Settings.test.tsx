@@ -106,4 +106,60 @@ describe("Settings", () => {
     );
     expect(onSaved).toHaveBeenCalledOnce();
   });
+  
+  it('saves fixed-status colors while protecting the claimed start status', async () => {
+    const updateWorkflow = vi.spyOn(api, 'updateWorkflow').mockResolvedValue({
+      ...workflow,
+      statuses: workflow.statuses.map((status) =>
+        status.id === 'backlog'
+          ? { ...status, color: '#123456' }
+          : status.id === 'closed'
+            ? { ...status, color: '#654321' }
+            : status.id === 'review'
+              ? undefined
+              : status,
+      ).filter((status) => status !== undefined),
+      revision: 2,
+    });
+    render(
+      <ThemeProvider>
+        <Settings workflow={workflow} onSaved={vi.fn().mockResolvedValue(undefined)} onError={vi.fn()} />
+      </ThemeProvider>,
+    );
+
+    const backlogColor = screen.getByLabelText('Backlog color');
+    const closedColor = screen.getByLabelText('Closed color');
+    fireEvent.change(backlogColor, { target: { value: '#123456' } });
+    fireEvent.change(closedColor, { target: { value: '#654321' } });
+    expect(backlogColor).not.toHaveProperty('disabled', true);
+    expect(closedColor).not.toHaveProperty('disabled', true);
+    expect(screen.getByLabelText('Backlog name')).toHaveProperty('disabled', true);
+    expect(screen.getByLabelText('Closed name')).toHaveProperty('disabled', true);
+    expect(screen.getAllByRole('checkbox', { name: 'Complete' })[0]).toHaveProperty('disabled', true);
+    expect(screen.getAllByRole('checkbox', { name: 'Complete' }).at(-1)).toHaveProperty('disabled', true);
+
+    const claimedRemove = screen.getByRole('button', {
+      name: 'Remove Todo (claimed start status)',
+    });
+    expect(claimedRemove).toHaveProperty('disabled', true);
+    fireEvent.click(claimedRemove);
+    expect(screen.getByRole('combobox', { name: 'Claimed tasks start in' })).toHaveProperty('value', 'todo');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Remove Review' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Save workflow' }));
+
+    await waitFor(() =>
+      expect(updateWorkflow).toHaveBeenCalledWith(
+        workflow,
+        expect.objectContaining({
+          startStatusId: 'todo',
+          statuses: expect.arrayContaining([
+            expect.objectContaining({ id: 'backlog', color: '#123456', fixed: 'backlog' }),
+            expect.objectContaining({ id: 'closed', color: '#654321', fixed: 'closed' }),
+          ]),
+        }),
+        { review: 'backlog' },
+      ),
+    );
+  });
 });

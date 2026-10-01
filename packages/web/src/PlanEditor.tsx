@@ -9,6 +9,7 @@ import { DialogShell, IconAction, TaskButton } from "./Controls";
 import { EffortSelect } from "./EffortSelect";
 import { IssueKey } from "./IssueKey";
 import { StatusSelect } from "./StatusSelect";
+import { MarkdownEditor } from "./MarkdownEditor";
 import { WorkItemViewer } from "./WorkItemViewer";
 import { api } from "./api";
 import { isClosed } from "./isClosed";
@@ -312,11 +313,11 @@ export function PlanEditor({
           value={summary}
           onChange={(event) => setSummary(event.target.value)}
         />
-        <Textarea
+        <MarkdownEditor
           label="Source plan (Markdown)"
-          rows={12}
           value={sourcePlan}
-          onChange={(event) => setSourcePlan(event.target.value)}
+          onChange={setSourcePlan}
+          height={320}
         />
         {plan && (
           <>

@@ -1,4 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
+import {
+  Burger,
+  Menu,
+  Switch,
+  useComputedColorScheme,
+  useMantineColorScheme,
+} from "@mantine/core";
 import { api, ApiError } from "./api";
 import { Board } from "./Board";
 import { Documentation } from "./Documentation";
@@ -11,7 +18,12 @@ import { WorkFilters, type WorkFilterValues } from "./WorkFilters";
 import { fuzzyMatch } from "./fuzzySearch";
 import { ToastProvider, useToast } from "./Toasts";
 import { sortByWorkPriority } from "./sortNewest";
-import { IconX } from "@tabler/icons-react";
+import { parseRoute, serializeRoute, type AppRoute, type AppView } from "./routes";
+import {
+  IconMoonStars,
+  IconSun,
+  IconX,
+} from "@tabler/icons-react";
 import { IconAction, TaskButton } from "./Controls";
 import type { Plan, Progress, Project, Task, Workflow } from "./types";
 
@@ -24,10 +36,16 @@ export function App() {
 }
 
 function TaskdroidApp() {
+  const [route, setRoute] = useState(() => parseRoute(window.location.href));
+  const view = route.view;
   const [project, setProject] = useState<Project>();
   const [plans, setPlans] = useState<Plan[]>([]);
-  const [planId, setPlanId] = useState("");
+  const [plansLoaded, setPlansLoaded] = useState(false);
+  const [planId, setPlanId] = useState(() =>
+    route.detail?.kind === "plan" ? route.detail.id : "",
+  );
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasksLoaded, setTasksLoaded] = useState(false);
   const [filters, setFilters] = useState<WorkFilterValues>({
     search: "",
     planStatusIds: null,
@@ -36,11 +54,13 @@ function TaskdroidApp() {
   });
   const [selectedTask, setSelectedTask] = useState<Task>();
   const [selectedSubtaskId, setSelectedSubtaskId] = useState<string>();
-  const [view, setView] = useState<
-    "board" | "list" | "plans" | "settings" | "documentation"
-  >("board");
-  const [editingPlan, setEditingPlan] = useState(false);
+  const [editingPlan, setEditingPlan] = useState(
+    () => route.detail?.kind === "plan",
+  );
   const [error, setError] = useState("");
+  const [menuOpened, setMenuOpened] = useState(false);
+  const computedColorScheme = useComputedColorScheme("light");
+  const { setColorScheme } = useMantineColorScheme();
   const toast = useToast();
 
   const loadProject = useCallback(async () => {
@@ -65,24 +85,31 @@ function TaskdroidApp() {
             );
       setProject(nextProject);
       setPlans(nextPlans);
+      setPlansLoaded(true);
       setPlanId((current) =>
         nextPlans.some((plan) => plan.id === current) ? current : "",
       );
       setError("");
     } catch (cause) {
+      setPlansLoaded(true);
       setError(message(cause));
     }
   }, [view]);
 
   const loadTasks = useCallback(async () => {
-    if (!shouldLoadTasks(view, planId)) {
+    const hasTaskRoute =
+      route.detail?.kind === "task" || route.detail?.kind === "subtask";
+    if (!shouldLoadTasks(view, planId) && !hasTaskRoute) {
       setTasks([]);
+      setTasksLoaded(true);
       return;
     }
+    setTasksLoaded(false);
     try {
-      const loaded = await api.tasks(planId || undefined);
+      const loaded = await api.tasks(hasTaskRoute ? undefined : planId || undefined);
       const active = loaded.filter((task) => !task.archivedAt);
       setTasks(active);
+      setTasksLoaded(true);
       setSelectedTask((current) =>
         current
           ? (active.find((task) => task.id === current.id) ?? current)
@@ -90,9 +117,10 @@ function TaskdroidApp() {
       );
       setError("");
     } catch (cause) {
+      setTasksLoaded(true);
       setError(message(cause));
     }
-  }, [planId, view]);
+  }, [planId, route.detail, view]);
 
   useEffect(() => {
     void loadProject();
@@ -100,6 +128,96 @@ function TaskdroidApp() {
   useEffect(() => {
     void loadTasks();
   }, [loadTasks]);
+  const updateRoute = useCallback((next: AppRoute, replace = false) => {
+    const url = serializeRoute(next);
+    const current = `${window.location.pathname}${window.location.search}`;
+    if (url === current) return;
+    if (replace) window.history.replaceState(null, "", url);
+    else window.history.pushState(null, "", url);
+    setRoute(parseRoute(url));
+    if (next.detail?.kind === "task" || next.detail?.kind === "subtask") {
+      setTasksLoaded(false);
+    }
+  }, []);
+  useEffect(() => {
+    const onPopState = () => {
+      const next = parseRoute(window.location.href);
+      if (next.view !== route.view) setPlansLoaded(false);
+      setTasksLoaded(false);
+      setRoute(next);
+      if (next.detail?.kind === "plan") setPlanId(next.detail.id);
+      else if (route.detail?.kind === "plan") setPlanId("");
+      setEditingPlan(next.detail?.kind === "plan");
+      setSelectedTask(undefined);
+      setSelectedSubtaskId(undefined);
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, [route]);
+  useEffect(() => {
+    const canonical = serializeRoute(route);
+    const current = `${window.location.pathname}${window.location.search}`;
+    if (canonical !== current) updateRoute(route, true);
+  }, [route, updateRoute]);
+  useEffect(() => {
+    if (view !== "plans" || !project || !plansLoaded) return;
+    const firstDocument = Object.keys(project.documents)[0];
+    if (
+      route.documentName &&
+      !Object.hasOwn(project.documents, route.documentName)
+    ) {
+      updateRoute({ ...route, documentName: firstDocument }, true);
+    } else if (!route.documentName && firstDocument) {
+      updateRoute({ ...route, documentName: firstDocument }, true);
+    }
+  }, [plansLoaded, project, route, updateRoute, view]);
+  useEffect(() => {
+    if (!project || !route.detail) return;
+    if (route.detail.kind === "plan") {
+      if (!plansLoaded) return;
+      const planId = route.detail.id;
+      const target = plans.find((item) => item.id === planId);
+      if (!target) {
+        setEditingPlan(false);
+        setPlanId("");
+        updateRoute({ ...route, detail: undefined }, true);
+        return;
+      }
+      setPlanId(target.id);
+      setSelectedTask(undefined);
+      setSelectedSubtaskId(undefined);
+      setEditingPlan(true);
+      return;
+    }
+    if (!tasksLoaded) return;
+    const detail = route.detail;
+    const target = tasks.find((item) =>
+      detail.kind === "task" ? item.id === detail.id : item.id === detail.taskId,
+    );
+    if (!target) {
+      setSelectedTask(undefined);
+      setSelectedSubtaskId(undefined);
+      updateRoute({ ...route, detail: undefined }, true);
+      return;
+    }
+    if (detail.kind === "subtask") {
+      const subtask = target.subtasks.find(
+        (item) => item.id === detail.id && !item.archivedAt,
+      );
+      if (!subtask) {
+        setSelectedTask(undefined);
+        setSelectedSubtaskId(undefined);
+        updateRoute({ ...route, detail: undefined }, true);
+        return;
+      }
+      setSelectedSubtaskId(subtask.id);
+    } else {
+      setSelectedSubtaskId(undefined);
+    }
+    setPlanId(target.planId);
+    setSelectedTask(target);
+    setEditingPlan(false);
+  }, [plans, plansLoaded, project, route, tasks, tasksLoaded, updateRoute]);
   const plan = plans.find((item) => item.id === planId);
   const filteredTasks = filterTasks(tasks, filters);
   const visiblePlans = plans.filter(
@@ -136,18 +254,47 @@ function TaskdroidApp() {
     });
     return () => events.close();
   }, [refresh]);
+  function navigateView(nextView: AppView) {
+    setEditingPlan(false);
+    setSelectedTask(undefined);
+    setSelectedSubtaskId(undefined);
+    if (nextView !== view) setPlansLoaded(false);
+    updateRoute({
+      view: nextView,
+      ...(nextView === "plans" && view === "plans" && route.documentName
+        ? { documentName: route.documentName }
+        : {}),
+    });
+  }
   function openTask(task: Task, subtaskId?: string) {
     setSelectedTask(task);
     setSelectedSubtaskId(subtaskId);
+    updateRoute({
+      ...route,
+      detail: subtaskId
+        ? { kind: "subtask", taskId: task.id, id: subtaskId }
+        : { kind: "task", id: task.id },
+    });
   }
   function closeTask() {
     setSelectedTask(undefined);
     setSelectedSubtaskId(undefined);
+    if (route.detail?.kind === "task" || route.detail?.kind === "subtask") {
+      updateRoute({ ...route, detail: undefined });
+    }
   }
   function openPlan(id: string) {
-    closeTask();
+    setSelectedTask(undefined);
+    setSelectedSubtaskId(undefined);
     setPlanId(id);
     setEditingPlan(true);
+    updateRoute({ ...route, detail: { kind: "plan", id } });
+  }
+  function closePlan() {
+    setEditingPlan(false);
+    if (route.detail?.kind === "plan") {
+      updateRoute({ ...route, detail: undefined });
+    }
   }
   function clearFilters() {
     setPlanId("");
@@ -161,58 +308,91 @@ function TaskdroidApp() {
 
   return (
     <div className="shell">
-      <header>
+      <header className="app-header">
         <div>
           <span className="logo">TD</span>
           <h1>{project?.name ?? "Taskdroid"}</h1>
         </div>
-        <nav aria-label="Primary navigation">
+        <nav className="primary-navigation" aria-label="Primary navigation">
           <TaskButton
             type="button"
-            variant={view === "board" ? "primary" : "default"}
+            variant="default"
             className={view === "board" ? "active" : undefined}
             aria-pressed={view === "board"}
-            onClick={() => setView("board")}
+            onClick={() => navigateView("board")}
           >
             Board
           </TaskButton>
           <TaskButton
             type="button"
-            variant={view === "list" ? "primary" : "default"}
+            variant="default"
             className={view === "list" ? "active" : undefined}
             aria-pressed={view === "list"}
-            onClick={() => setView("list")}
+            onClick={() => navigateView("list")}
           >
             List
           </TaskButton>
           <TaskButton
             type="button"
-            variant={view === "plans" ? "primary" : "default"}
+            variant="default"
             className={view === "plans" ? "active" : undefined}
             aria-pressed={view === "plans"}
-            onClick={() => setView("plans")}
+            onClick={() => navigateView("plans")}
           >
             Project
           </TaskButton>
-          <TaskButton
-            type="button"
-            variant={view === "settings" ? "primary" : "default"}
-            className={view === "settings" ? "active" : undefined}
-            aria-pressed={view === "settings"}
-            onClick={() => setView("settings")}
-          >
-            Settings
-          </TaskButton>
-          <TaskButton
-            type="button"
-            variant={view === "documentation" ? "primary" : "default"}
-            className={view === "documentation" ? "active" : undefined}
-            aria-pressed={view === "documentation"}
-            onClick={() => setView("documentation")}
-          >
-            Documentation
-          </TaskButton>
         </nav>
+        <div className="app-header-actions">
+          <Menu
+            opened={menuOpened}
+            onChange={setMenuOpened}
+            position="bottom-end"
+            transitionProps={{ duration: 0 }}
+            withinPortal
+          >
+            <Menu.Target>
+              <Burger
+                opened={menuOpened}
+                aria-label={menuOpened ? "Close menu" : "Open menu"}
+                size="sm"
+              />
+            </Menu.Target>
+            <Menu.Dropdown>
+              <div className="header-menu-scheme">
+                <Switch
+                  checked={computedColorScheme === "dark"}
+                  onChange={(event) =>
+                    setColorScheme(event.currentTarget.checked ? "dark" : "light")
+                  }
+                  aria-label="Dark mode"
+                  thumbIcon={
+                    computedColorScheme === "dark" ? (
+                      <IconMoonStars size={12} />
+                    ) : (
+                      <IconSun size={12} />
+                    )
+                  }
+                />
+                <span>Dark mode</span>
+              </div>
+              <Menu.Divider />
+              <Menu.Item
+                aria-label="Settings"
+                aria-current={view === "settings" ? "page" : undefined}
+                onClick={() => navigateView("settings")}
+              >
+                Settings
+              </Menu.Item>
+              <Menu.Item
+                aria-label="Documentation"
+                aria-current={view === "documentation" ? "page" : undefined}
+                onClick={() => navigateView("documentation")}
+              >
+                Documentation
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+        </div>
       </header>
       {error && (
         <div className="error" role="alert">
@@ -250,10 +430,11 @@ function TaskdroidApp() {
               project={project}
               plans={dashboardPlans}
               workflow={project.workflow}
-              onSelect={(selected) => {
-                setPlanId(selected.id);
-                setEditingPlan(true);
-              }}
+              activeDocumentName={route.documentName}
+                onDocumentChange={(name) =>
+                  updateRoute({ ...route, documentName: name })
+                }
+              onSelect={(selected) => openPlan(selected.id)}
               onCreate={() => {
                 setPlanId("");
                 setEditingPlan(true);
@@ -337,7 +518,7 @@ function TaskdroidApp() {
             setEditingPlan(false);
             openTask(task);
           }}
-          onClose={() => setEditingPlan(false)}
+          onClose={closePlan}
           onSaved={refresh}
           onError={(cause) => setError(message(cause))}
         />
@@ -351,6 +532,8 @@ function TaskdroidApp() {
           workflow={project.workflow}
           archived={false}
           onSelectPlan={() => openPlan(selectedTask.planId)}
+          onSelectSubtask={(task, subtaskId) => openTask(task, subtaskId)}
+          onReturnToTask={(task) => openTask(task)}
           onClose={closeTask}
           onSaved={refresh}
           onError={(cause) => setError(message(cause))}
