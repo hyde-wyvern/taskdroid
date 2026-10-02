@@ -1,7 +1,7 @@
 {
   "name": "@culto/taskdroid-mcp",
   "description": "stdio MCP server for reading and managing local Taskdroid project work.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Culto",
   "license": "GPL-3.0-or-later",
   "repository": { "type": "git", "url": "https://github.com/hyde-wyvern/taskdroid.git", "directory": "packages/mcp" },
@@ -19,6 +19,6 @@
     "prepack": "node ../../scripts/prepare-workspace-pack.mjs",
     "postpack": "node ../../scripts/cleanup-workspace-pack.mjs"
   },
-  "dependencies": { "@modelcontextprotocol/sdk": "^1.18.2", "@culto/taskdroid-core": "0.1.0", "zod": "^4.1.11" },
+  "dependencies": { "@modelcontextprotocol/sdk": "^1.18.2", "@culto/taskdroid-core": "0.1.1", "zod": "^4.1.11" },
   "publishConfig": { "access": "public" }
 }
