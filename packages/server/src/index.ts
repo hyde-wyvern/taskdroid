@@ -1,6 +1,6 @@
 import express, { type ErrorRequestHandler } from "express";
 import { watch } from "node:fs";
-import { join } from "node:path";
+import { extname, join } from "node:path";
 import { TaskdroidError, TaskdroidService } from "@culto/taskdroid-core";
 
 export function createApp(service: TaskdroidService, webRoot?: string) {
@@ -290,9 +290,20 @@ export function createApp(service: TaskdroidService, webRoot?: string) {
 
   if (webRoot) {
     app.use(express.static(webRoot));
-    app.get("*path", (_request, response) =>
-      response.sendFile(join(webRoot, "index.html")),
-    );
+    app.get("*path", (request, response, next) => {
+      const acceptsHtml = request.headers.accept?.includes("text/html");
+      if (
+        !acceptsHtml ||
+        request.path.startsWith("/api/") ||
+        extname(request.path)
+      ) {
+        next();
+        return;
+      }
+      response.sendFile(join(webRoot, "index.html"), (error) => {
+        if (error) next(error);
+      });
+    });
   }
 
   const errors: ErrorRequestHandler = (error, _request, response, next) => {
@@ -310,6 +321,12 @@ export function createApp(service: TaskdroidService, webRoot?: string) {
           message: error.message,
           details: error.details,
         },
+      });
+      return;
+    }
+    if (httpStatus(error) === 404) {
+      response.status(404).json({
+        error: { code: "NOT_FOUND", message: "Not found" },
       });
       return;
     }
@@ -332,4 +349,13 @@ function textQuery(value: unknown): string | undefined {
 }
 function param(value: string | string[]): string {
   return Array.isArray(value) ? value[0] : value;
+}
+
+function httpStatus(error: unknown): number | undefined {
+  if (typeof error !== "object" || error === null) return undefined;
+  const candidate = error as { status?: unknown; statusCode?: unknown };
+  if (typeof candidate.status === "number") return candidate.status;
+  return typeof candidate.statusCode === "number"
+    ? candidate.statusCode
+    : undefined;
 }

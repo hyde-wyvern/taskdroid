@@ -31,6 +31,22 @@ describe("MarkdownContent", () => {
     expect(screen.getByText("const answer = 42;")).toBeTruthy();
   });
 
+  it("renders GitHub-flavored Markdown tables", () => {
+    render(
+      <MarkdownContent
+        content={[
+          "| Name | Status |",
+          "| --- | --- |",
+          "| Dashboard | Done |",
+        ].join("\n")}
+      />,
+    );
+
+    expect(screen.getByRole("table")).toBeTruthy();
+    expect(screen.getByRole("columnheader", { name: "Name" })).toBeTruthy();
+    expect(screen.getByRole("cell", { name: "Done" })).toBeTruthy();
+  });
+
   it("does not render raw HTML or unsafe link protocols", () => {
     const { container } = render(
       <MarkdownContent

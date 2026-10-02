@@ -1,4 +1,4 @@
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { once } from "node:events";
 import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
@@ -16,6 +16,16 @@ afterEach(async () =>
 );
 
 describe("HTTP API", () => {
+  it("returns a controlled 404 when the dashboard entry file is unavailable", async () => {
+    const root = await mkdtemp(join(tmpdir(), "taskdroid-dashboard-"));
+    roots.push(root);
+    const service = await TaskdroidService.initialize(root, "Dashboard");
+
+    await request(createApp(service, join(root, "missing-web")))
+      .get("/project")
+      .expect(404);
+  });
+
   it("creates and moves work while reporting revision conflicts", async () => {
     const root = await mkdtemp(join(tmpdir(), "taskdroid-http-"));
     roots.push(root);
@@ -85,5 +95,33 @@ describe("HTTP API", () => {
       await reader.cancel();
       await new Promise<void>((resolve) => server.close(() => resolve()));
     }
+  });
+
+  it("serves dashboard assets without routing missing assets to the app", async () => {
+    const root = await mkdtemp(join(tmpdir(), "taskdroid-web-"));
+    roots.push(root);
+    const webRoot = join(root, "web");
+    await mkdir(join(webRoot, "assets"), { recursive: true });
+    await Promise.all([
+      writeFile(join(webRoot, "index.html"), "<main>Taskdroid</main>"),
+      writeFile(join(webRoot, "assets", "editor.js"), "export default {};"),
+    ]);
+    const service = await TaskdroidService.initialize(root, "Web");
+    const app = createApp(service, webRoot);
+
+    await request(app)
+      .get("/assets/editor.js")
+      .set("Accept", "*/*")
+      .expect(200)
+      .expect("content-type", /javascript/);
+    await request(app)
+      .get("/assets/missing-editor.js")
+      .set("Accept", "*/*")
+      .expect(404);
+    await request(app)
+      .get("/project?document=architecture.md")
+      .set("Accept", "text/html")
+      .expect(200)
+      .expect("<main>Taskdroid</main>");
   });
 });
