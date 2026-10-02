@@ -12,25 +12,15 @@ Taskdroid 0.1.0 is a pre-1.0 preview. Expect changes; stable schema and API comp
 
 ## Requirements and installation
 
-Node.js 22 or newer is required. The CLI is not published to npm yet. For now, install it from the source repository:
+Node.js 22 or newer is required. Install the published CLI from the public npm registry:
 
 ```sh
-git clone https://github.com/hyde-wyvern/taskdroid.git
-cd taskdroid
-npm install
-npm run build
-npm link -w @culto/taskdroid
-```
-
-Once the package is published, the intended install command is:
-
-```sh
-npm install --global @culto/taskdroid
+npm install --global @culto/taskdroid --registry=https://registry.npmjs.org/
 ```
 
 ## Quick start
 
-From a directory outside the source checkout, create a project of its own, then initialize it and start the dashboard:
+From the directory you want to use for your project, initialize it and start the dashboard:
 
 ```sh
 mkdir my-project

@@ -4,15 +4,13 @@ Taskdroid keeps plans and day-to-day work in a local project. This guide covers 
 
 ## Requirements and setup
 
-Taskdroid requires Node.js 22 or newer. Until the CLI package is published, install it from a source checkout:
+Taskdroid requires Node.js 22 or newer. Install the published CLI from the public npm registry:
 
 ```sh
-git clone https://github.com/hyde-wyvern/taskdroid.git
-cd taskdroid
-npm install
-npm run build
-npm link -w @culto/taskdroid
+npm install --global @culto/taskdroid --registry=https://registry.npmjs.org/
 ```
+
+Contributors working from source should follow the [Developer and Contribution Guide](developer-guide.md).
 
 Create a separate project directory, then initialize and open its dashboard:
 
