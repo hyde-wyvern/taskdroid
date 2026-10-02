@@ -29,12 +29,9 @@ for (const item of packages) {
       `${item.directory}: expected ${item.name}, found ${manifest.name}`,
     );
   }
-  if (
-    manifest.version !== cliManifest.version ||
-    manifest.version !== "0.1.0"
-  ) {
+  if (manifest.version !== cliManifest.version) {
     throw new Error(
-      `${item.name}: release version must match ${cliManifest.version} and v0.1.0`,
+      `${item.name}: release version must match ${cliManifest.version}`,
     );
   }
   if (
