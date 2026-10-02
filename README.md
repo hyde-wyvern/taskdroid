@@ -1,7 +1,7 @@
 # Taskdroid
 
 <p align="center">
-  <img src="public/logo.svg" alt="Taskdroid logo" width="180">
+  <img src="https://raw.githubusercontent.com/hyde-wyvern/taskdroid/main/public/logo.png" alt="Taskdroid logo" width="180">
 </p>
 <p align="center">Local-first planning for people and AI agents</p>
 
