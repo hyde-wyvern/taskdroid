@@ -1,7 +1,7 @@
 {
   "name": "@culto/taskdroid",
   "description": "Local-first task planning and work tracking CLI for people and AI agents.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "Culto",
   "license": "GPL-3.0-or-later",
   "repository": { "type": "git", "url": "https://github.com/hyde-wyvern/taskdroid.git", "directory": "packages/cli" },
@@ -18,9 +18,9 @@
     "postpack": "node ../../scripts/cleanup-workspace-pack.mjs"
   },
   "dependencies": {
-    "@culto/taskdroid-core": "0.1.1",
-    "@culto/taskdroid-mcp": "0.1.1",
-    "@culto/taskdroid-server": "0.1.1",
+    "@culto/taskdroid-core": "0.1.2",
+    "@culto/taskdroid-mcp": "0.1.2",
+    "@culto/taskdroid-server": "0.1.2",
     "commander": "^14.0.1",
     "open": "^10.2.0"
   },
