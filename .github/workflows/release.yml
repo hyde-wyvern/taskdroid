@@ -2,7 +2,7 @@ name: Release
 
 on:
   push:
-    tags: [v0.1.0]
+    tags: ["v*"]
 
 permissions:
   contents: read
@@ -18,31 +18,28 @@ jobs:
       contents: write
       id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.ref }}
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org/
           scope: "@culto"
           package-manager-cache: false
-      - run: npm install --global 'npm@^11.5.1'
+      - run: npm install --global npm@11.5.1
       - run: npm ci
       - name: Verify release tag
-        run: test "$GITHUB_REF_NAME" = "v0.1.0"
+        run: |
+          if [[ "$GITHUB_REF_NAME" == "v0.1.0" ]]; then
+            echo "::error::v0.1.0 is the completed bootstrap release and must not be rerun."
+            exit 1
+          fi
       - run: npm run validate
       - run: npm run lint
       - run: node scripts/check-packages.mjs "$GITHUB_REF_NAME"
       - name: Publish runtime packages
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          if [[ -z "${NPM_TOKEN:-}" ]]; then
-            echo "::error::The first v0.1.0 publish requires the NPM_TOKEN bootstrap secret; npm trusted publishers can only be configured after packages exist."
-            exit 1
-          fi
-          export NODE_AUTH_TOKEN="$NPM_TOKEN"
           npm publish --workspace @culto/taskdroid-core --access public --provenance --registry=https://registry.npmjs.org/
           npm publish --workspace @culto/taskdroid-server --access public --provenance --registry=https://registry.npmjs.org/
           npm publish --workspace @culto/taskdroid-mcp --access public --provenance --registry=https://registry.npmjs.org/
