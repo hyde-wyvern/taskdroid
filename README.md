@@ -1,6 +1,17 @@
 # Taskdroid
 
-Taskdroid is local-first planning and work tracking for people and AI agents. It organizes work as **Project → Plan → Task → Subtask**, with a browser dashboard and a stdio MCP server over the same project data.
+<p align="center">
+  <img src="public/logo.svg" alt="Taskdroid logo" width="180">
+</p>
+<p align="center">Local-first planning for people and AI agents</p>
+
+[![npm version](https://img.shields.io/npm/v/%40culto%2Ftaskdroid)](https://www.npmjs.com/package/@culto/taskdroid)
+[![npm downloads](https://img.shields.io/npm/dm/%40culto%2Ftaskdroid)](https://www.npmjs.com/package/@culto/taskdroid)
+[![CI](https://github.com/hyde-wyvern/taskdroid/actions/workflows/ci.yml/badge.svg)](https://github.com/hyde-wyvern/taskdroid/actions/workflows/ci.yml)
+[![License](https://img.shields.io/npm/l/%40culto%2Ftaskdroid)](https://github.com/hyde-wyvern/taskdroid/blob/main/LICENSE)
+[![Node.js 22+](https://img.shields.io/badge/Node.js-22%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+
+Organize work as **Project → Plan → Task → Subtask**, with a browser dashboard and a stdio MCP server over the same project data.
 
 Taskdroid 0.1.0 is a pre-1.0 preview. Expect changes; stable schema and API compatibility are not promised.
 
