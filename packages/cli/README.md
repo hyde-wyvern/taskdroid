@@ -13,7 +13,7 @@
 
 Organize work as **Project → Plan → Task → Subtask**, with a browser dashboard and a stdio MCP server over the same project data.
 
-Taskdroid 0.1.1 is a pre-1.0 preview. Expect changes; stable schema and API compatibility are not promised.
+Taskdroid 0.1.3 is a pre-1.0 preview. Expect changes; stable schema and API compatibility are not promised.
 
 ## Who it is for
 
