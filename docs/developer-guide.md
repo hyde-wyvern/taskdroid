@@ -4,7 +4,7 @@ Taskdroid is an npm workspace for a local-first planning tool. The [README](../R
 
 ## Requirements
 
-- Node.js 22 or newer
+- Node.js 22.13 or newer (ESLint 10 requirement)
 - npm
 
 ## Workspace layout

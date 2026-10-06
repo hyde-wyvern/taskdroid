@@ -49,7 +49,7 @@ describe("TaskdroidService", () => {
       task.revision,
       { statusId: "done" },
     );
-    task = await app.updateSubtask(
+    await app.updateSubtask(
       task.id,
       task.subtasks[1].id,
       task.revision,

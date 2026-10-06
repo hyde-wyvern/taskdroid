@@ -306,6 +306,10 @@ export function createApp(service: TaskdroidService, webRoot?: string) {
     });
   }
 
+  app.use((_request, _response, next) =>
+    next(new TaskdroidError("NOT_FOUND", "Not found")),
+  );
+
   const errors: ErrorRequestHandler = (error, _request, response, next) => {
     void next;
     if (error instanceof TaskdroidError) {

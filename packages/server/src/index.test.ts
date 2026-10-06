@@ -97,7 +97,7 @@ describe("HTTP API", () => {
     }
   });
 
-  it("serves dashboard assets without routing missing assets to the app", async () => {
+  it("serves client routes without routing missing assets or APIs to the app", async () => {
     const root = await mkdtemp(join(tmpdir(), "taskdroid-web-"));
     roots.push(root);
     const webRoot = join(root, "web");
@@ -123,5 +123,20 @@ describe("HTTP API", () => {
       .set("Accept", "text/html")
       .expect(200)
       .expect("<main>Taskdroid</main>");
+    await request(app)
+      .get("/board")
+      .set("Accept", "text/html")
+      .expect(200)
+      .expect("<main>Taskdroid</main>");
+    await request(app)
+      .get("/project?detail=plan:plan-id")
+      .set("Accept", "text/html")
+      .expect(200)
+      .expect("<main>Taskdroid</main>");
+    await request(app)
+      .get("/api/missing")
+      .set("Accept", "text/html")
+      .expect(404)
+      .expect("content-type", /json/);
   });
 });
