@@ -40,7 +40,7 @@ taskdroid init --name "My project"
 taskdroid ui
 ```
 
-The dashboard opens at `http://127.0.0.1:4317` by default. Run `taskdroid mcp` from the project directory to connect an MCP client over stdio. See the [User Guide](docs/user-guide.md) and [Agent and MCP Guide](docs/agent-mcp-guide.md) for setup and workflows.
+The dashboard opens at `http://127.0.0.1:4317` by default. Run `taskdroid mcp` from the project directory to connect an MCP client over stdio. See the [User Guide](https://github.com/hyde-wyvern/taskdroid/blob/main/docs/user-guide.md) and [Agent and MCP Guide](https://github.com/hyde-wyvern/taskdroid/blob/main/docs/agent-mcp-guide.md) for setup and workflows.
 
 ## Commands
 
