@@ -7,6 +7,7 @@
 
 [![npm version](https://img.shields.io/npm/v/%40culto%2Ftaskdroid)](https://www.npmjs.com/package/@culto/taskdroid)
 [![npm downloads](https://img.shields.io/npm/dm/%40culto%2Ftaskdroid)](https://www.npmjs.com/package/@culto/taskdroid)
+[![Socket Badge](https://socket.dev/api/badge/npm/package/@culto/taskdroid)](https://socket.dev/npm/package/%40culto%2Ftaskdroid)
 [![CI](https://github.com/hyde-wyvern/taskdroid/actions/workflows/ci.yml/badge.svg)](https://github.com/hyde-wyvern/taskdroid/actions/workflows/ci.yml)
 [![License](https://img.shields.io/npm/l/%40culto%2Ftaskdroid)](https://github.com/hyde-wyvern/taskdroid/blob/main/LICENSE)
 [![Node.js 22+](https://img.shields.io/badge/Node.js-22%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
