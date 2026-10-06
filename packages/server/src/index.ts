@@ -294,6 +294,7 @@ export function createApp(service: TaskdroidService, webRoot?: string) {
       const acceptsHtml = request.headers.accept?.includes("text/html");
       if (
         !acceptsHtml ||
+        request.path === "/api" ||
         request.path.startsWith("/api/") ||
         extname(request.path)
       ) {

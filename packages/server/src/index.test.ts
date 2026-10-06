@@ -133,10 +133,11 @@ describe("HTTP API", () => {
       .set("Accept", "text/html")
       .expect(200)
       .expect("<main>Taskdroid</main>");
-    await request(app)
-      .get("/api/missing")
-      .set("Accept", "text/html")
-      .expect(404)
-      .expect("content-type", /json/);
+    for (const path of ["/api", "/api/missing"])
+      await request(app)
+        .get(path)
+        .set("Accept", "text/html")
+        .expect(404)
+        .expect("content-type", /json/);
   });
 });
