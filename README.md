@@ -13,7 +13,7 @@
 
 Organize work as **Project → Plan → Task → Subtask**, with a browser dashboard and a stdio MCP server over the same project data.
 
-Taskdroid 0.1.1 is a pre-1.0 preview. Expect changes; stable schema and API compatibility are not promised.
+Taskdroid 0.1.3 is a pre-1.0 preview. Expect changes; stable schema and API compatibility are not promised.
 
 ## Who it is for
 
@@ -45,7 +45,7 @@ The dashboard opens at `http://127.0.0.1:4317` by default. Run `taskdroid mcp` f
 ## Commands
 
 - `taskdroid init [--name <name>] [--manage-agent-instructions]` initializes the current directory; interactive use may offer to manage its root `AGENTS.md`.
-- `taskdroid ui [--host <host>] [--port <port>] [--no-open]` serves the dashboard (defaults: `127.0.0.1:4317`).
+- `taskdroid ui [--host <host>] [--port <port>] [--next-available-port] [--no-open]` serves the dashboard (defaults: `127.0.0.1:4317`).
 - `taskdroid mcp` runs the stdio MCP server.
 - `taskdroid validate` validates the current project's local data.
 
