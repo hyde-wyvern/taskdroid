@@ -23,6 +23,12 @@ taskdroid ui
 
 The dashboard is served at `http://127.0.0.1:4317` by default. Use `taskdroid ui --no-open` to avoid opening a browser automatically, or pass `--port <port>` to choose another port. The default host is loopback; avoid binding to a network interface unless you have secured access yourself.
 
+When the requested port is occupied in an interactive terminal, Taskdroid asks whether to retry on the next available port. Reply `y` to accept; any other response keeps the controlled `PORT_IN_USE` error. For scripts or other non-interactive use, pass `--next-available-port` to opt into that retry explicitly.
+
+## Troubleshooting dashboard refreshes
+
+If refreshing a dashboard deep link such as `/board` or `/project` returns a JSON `NOT_FOUND` response after an upgrade, the browser is reaching an older `taskdroid ui` process. Stop that process and restart `taskdroid ui` from the intended project directory. Updating the installed CLI cannot update code already loaded by a running process. Startup output shows the running Taskdroid version, project root, and dashboard URL to help identify the correct process.
+
 On a browser's first visit to a project, onboarding appears before the requested dashboard view. Continue returns to that view, including direct links. Completion is stored in that browser's local storage under the stable project ID. The logo opens onboarding again at any time.
 
 ## Dashboard views

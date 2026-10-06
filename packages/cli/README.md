@@ -7,7 +7,6 @@
 
 [![npm version](https://img.shields.io/npm/v/%40culto%2Ftaskdroid)](https://www.npmjs.com/package/@culto/taskdroid)
 [![npm downloads](https://img.shields.io/npm/dm/%40culto%2Ftaskdroid)](https://www.npmjs.com/package/@culto/taskdroid)
-[![Socket Badge](https://socket.dev/api/badge/npm/package/@culto/taskdroid)](https://socket.dev/npm/package/%40culto%2Ftaskdroid)
 [![CI](https://github.com/hyde-wyvern/taskdroid/actions/workflows/ci.yml/badge.svg)](https://github.com/hyde-wyvern/taskdroid/actions/workflows/ci.yml)
 [![License](https://img.shields.io/npm/l/%40culto%2Ftaskdroid)](https://github.com/hyde-wyvern/taskdroid/blob/main/LICENSE)
 [![Node.js 22+](https://img.shields.io/badge/Node.js-22%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
@@ -41,7 +40,7 @@ taskdroid init --name "My project"
 taskdroid ui
 ```
 
-The dashboard opens at `http://127.0.0.1:4317` by default. Run `taskdroid mcp` from the project directory to connect an MCP client over stdio. See the [User Guide](docs/user-guide.md) and [Agent and MCP Guide](docs/agent-mcp-guide.md) for setup and workflows.
+The dashboard opens at `http://127.0.0.1:4317` by default. Run `taskdroid mcp` from the project directory to connect an MCP client over stdio. See the [User Guide](https://github.com/hyde-wyvern/taskdroid/blob/main/docs/user-guide.md) and [Agent and MCP Guide](https://github.com/hyde-wyvern/taskdroid/blob/main/docs/agent-mcp-guide.md) for setup and workflows.
 
 ## Commands
 

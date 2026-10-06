@@ -1,7 +1,7 @@
 {
   "name": "@culto/taskdroid-core",
   "description": "Schemas, workflow rules, storage, and domain service for Taskdroid projects.",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "author": "Culto",
   "license": "GPL-3.0-or-later",
   "repository": { "type": "git", "url": "https://github.com/hyde-wyvern/taskdroid.git", "directory": "packages/core" },
