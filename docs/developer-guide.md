@@ -35,6 +35,28 @@ npm run build
 
 `npm run build -w @culto/taskdroid` builds the private `@culto/taskdroid-web` workspace, compiles the CLI, then copies the Vite output into `packages/cli/dist/web`. The CLI package publishes `dist` only; keep dashboard source and the web workspace private.
 
+### Run the local CLI
+
+After building, run the repository's CLI instead of a globally installed Taskdroid binary:
+
+```sh
+npm run build
+./node_modules/.bin/taskdroid ui --next-available-port
+```
+
+The local binary is linked to `packages/cli/dist/index.js`. You can also invoke it directly:
+
+```sh
+node packages/cli/dist/index.js ui --next-available-port
+```
+
+Use the same local binary for MCP or project validation:
+
+```sh
+./node_modules/.bin/taskdroid mcp
+./node_modules/.bin/taskdroid validate
+```
+
 Keep changes scoped to the owning package. Add focused tests for domain, API, and dashboard behavior. Preserve revision checks, cross-process locking, schema validation, and atomic storage writes. Do not edit `.taskdroid/` JSON directly when working in a Taskdroid project; use the service or MCP tools.
 
 ## Contribute

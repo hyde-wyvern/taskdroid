@@ -14,7 +14,7 @@
 
 Organize work as **Project → Plan → Task → Subtask**, with a browser dashboard and a stdio MCP server over the same project data.
 
-Taskdroid 0.1.3 is a pre-1.0 preview. Expect changes; stable schema and API compatibility are not promised.
+Taskdroid 0.1.4 is a pre-1.0 preview. Expect changes; stable schema and API compatibility are not promised.
 
 ## Who it is for
 
@@ -42,6 +42,10 @@ taskdroid ui
 ```
 
 The dashboard opens at `http://127.0.0.1:4317` by default. Run `taskdroid mcp` from the project directory to connect an MCP client over stdio. See the [User Guide](docs/user-guide.md) and [Agent and MCP Guide](docs/agent-mcp-guide.md) for setup and workflows.
+
+To connect a local project to ChatGPT through OpenAI Secure MCP Tunnel, see the [ChatGPT Tunnel Guide](docs/chatgpt-tunnel-guide.md).
+
+To access the dashboard privately from another device on your tailnet, see the [Tailscale Dashboard Guide](docs/tailscale-dashboard-guide.md).
 
 ## Commands
 

@@ -62,7 +62,7 @@ export function DocumentEditorDialog({
   }
 
   return (
-    <DialogShell title={title} onClose={onClose} wide>
+    <DialogShell title={title} onClose={onClose} wide lockScroll={false}>
       <DetailHeader title={title} crumbs={[]} onClose={onClose} />
       <div className="document-editor-form">
         <TextInput

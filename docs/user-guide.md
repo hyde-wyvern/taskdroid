@@ -23,6 +23,8 @@ taskdroid ui
 
 The dashboard is served at `http://127.0.0.1:4317` by default. Use `taskdroid ui --no-open` to avoid opening a browser automatically, or pass `--port <port>` to choose another port. The default host is loopback; avoid binding to a network interface unless you have secured access yourself.
 
+To use the dashboard from another device without exposing it publicly, follow the [Tailscale Dashboard Guide](tailscale-dashboard-guide.md). It keeps Taskdroid bound to loopback and proxies the complete dashboard origin through Tailscale Serve. Because the dashboard has no sign-in, limit tailnet access to trusted users and devices.
+
 When the requested port is occupied in an interactive terminal, Taskdroid asks whether to retry on the next available port. Reply `y` to accept; any other response keeps the controlled `PORT_IN_USE` error. For scripts or other non-interactive use, pass `--next-available-port` to opt into that retry explicitly.
 
 ## Troubleshooting dashboard refreshes

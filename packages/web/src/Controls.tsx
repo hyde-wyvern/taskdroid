@@ -65,11 +65,13 @@ export function DialogShell({
   onClose,
   children,
   wide = false,
+  lockScroll = true,
 }: {
   title: string;
   onClose: () => void;
   children: ReactNode;
   wide?: boolean;
+  lockScroll?: boolean;
 }) {
   return (
     <Modal
@@ -80,6 +82,7 @@ export function DialogShell({
       title={title}
       size={wide ? "900px" : "630px"}
       padding={20}
+      lockScroll={lockScroll}
       classNames={{
         header: "taskdroid-modal-header",
         overlay: "taskdroid-modal-overlay",
