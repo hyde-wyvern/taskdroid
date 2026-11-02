@@ -10,7 +10,7 @@
   "dependencies": {
     "@mantine/core": "^9.6.3",
     "@mantine/hooks": "^9.6.3",
-    "@tabler/icons-react": "^3.48.0",
+    "@tabler/icons-react": "^3.50.0",
     "@uiw/react-md-editor": "^4.1.2",
     "@vitejs/plugin-react": "^5.0.4",
     "react": "^19.1.1",
