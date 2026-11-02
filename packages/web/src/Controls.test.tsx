@@ -42,6 +42,16 @@ describe("shared Mantine controls", () => {
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce());
   });
 
+  it("can keep the page scrollable for conditionally mounted editors", () => {
+    renderWithMantine(
+      <DialogShell title="Edit document" onClose={vi.fn()} lockScroll={false}>
+        <h2>Edit document</h2>
+      </DialogShell>,
+    );
+
+    expect(document.body.style.overflow).not.toBe("hidden");
+  });
+
   it("uses a native named status select and reports keyboard selection changes", () => {
     const onChange = vi.fn();
     const statuses = [

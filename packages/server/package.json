@@ -19,7 +19,7 @@
     "prepack": "node ../../scripts/prepare-workspace-pack.mjs",
     "postpack": "node ../../scripts/cleanup-workspace-pack.mjs"
   },
-  "dependencies": { "@culto/taskdroid-core": "0.1.3", "express": "^5.1.0" },
+  "dependencies": { "@culto/taskdroid-core": "0.1.3", "express": "5.2.1" },
   "devDependencies": { "@types/express": "^5.0.3", "supertest": "^7.1.4", "@types/supertest": "^6.0.3" },
   "publishConfig": { "access": "public" }
 }
