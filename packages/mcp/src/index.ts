@@ -1,7 +1,45 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import type { ToolAnnotations } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import { TaskdroidError, TaskdroidService } from "@culto/taskdroid-core";
+
+const readOnly: ToolAnnotations = {
+  readOnlyHint: true,
+  destructiveHint: false,
+  idempotentHint: true,
+  openWorldHint: false,
+};
+const create: ToolAnnotations = {
+  readOnlyHint: false,
+  destructiveHint: false,
+  idempotentHint: false,
+  openWorldHint: false,
+};
+const update: ToolAnnotations = {
+  readOnlyHint: false,
+  destructiveHint: true,
+  idempotentHint: false,
+  openWorldHint: false,
+};
+const stateChange: ToolAnnotations = {
+  readOnlyHint: false,
+  destructiveHint: false,
+  idempotentHint: false,
+  openWorldHint: false,
+};
+const archive: ToolAnnotations = {
+  readOnlyHint: false,
+  destructiveHint: true,
+  idempotentHint: false,
+  openWorldHint: false,
+};
+const replaceChildren: ToolAnnotations = {
+  readOnlyHint: false,
+  destructiveHint: true,
+  idempotentHint: false,
+  openWorldHint: false,
+};
 
 const effort = z.number().int().min(0).max(100);
 const taskInput = z.object({
@@ -29,6 +67,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
     "get_project",
     "Get current project, workflow, plans, and progress",
     {},
+    readOnly,
     async () => service.getProject(),
   );
   tool(
@@ -36,6 +75,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
     "list_documents",
     "List project Markdown document names",
     {},
+    readOnly,
     async () => service.listDocuments(),
   );
   tool(
@@ -43,6 +83,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
     "get_document",
     "Get one project Markdown document",
     { name: z.string().min(1) },
+    readOnly,
     async (args) => service.getDocument(args.name),
   );
   tool(
@@ -50,6 +91,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
     "update_document",
     "Update one project Markdown document",
     { name: z.string().min(1), content: z.string(), ...revision },
+    update,
     async (args) =>
       service.updateDocument(args.name, args.content, args.expectedRevision),
   );
@@ -58,6 +100,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
     "list_plans",
     "List plans and weighted progress",
     { includeArchived: z.boolean().optional() },
+    readOnly,
     async (args) => service.listPlans(args.includeArchived),
   );
   tool(
@@ -65,6 +108,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
     "get_plan",
     "Get plan by ID or issue key, with tasks and progress",
     { ...lookupIdentifier, archived: z.boolean().optional() },
+    readOnly,
     async (args) => {
       const reference = recordReference(args);
       return reference.key
@@ -83,6 +127,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
       statusId: z.string().optional(),
       tasks: z.array(taskInput).optional(),
     },
+    create,
     async (args) => service.createPlan(args),
   );
   tool(
@@ -97,6 +142,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
       sourcePlan: z.string().optional(),
       statusId: z.string().optional(),
     },
+    update,
     async ({ id, expectedRevision, ...changes }) =>
       service.updatePlan(id, expectedRevision, changes),
   );
@@ -105,6 +151,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
     "archive_plan",
     "Archive plan",
     { id: z.string(), ...revision },
+    archive,
     async (args) => service.archivePlan(args.id, args.expectedRevision),
   );
   tool(
@@ -112,6 +159,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
     "restore_plan",
     "Restore plan",
     { id: z.string(), ...revision },
+    stateChange,
     async (args) => service.restorePlan(args.id, args.expectedRevision),
   );
   tool(
@@ -123,6 +171,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
       statusId: z.string().optional(),
       includeArchived: z.boolean().optional(),
     },
+    readOnly,
     async (args) => service.listTasks(args),
   );
   tool(
@@ -130,6 +179,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
     "get_task",
     "Get task and subtasks by ID or issue key",
     { ...lookupIdentifier, archived: z.boolean().optional() },
+    readOnly,
     async (args) => {
       const reference = recordReference(args);
       return reference.key
@@ -142,6 +192,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
     "get_subtask",
     "Get a subtask by ID or issue key",
     lookupIdentifier,
+    readOnly,
     async (args) => {
       const reference = recordReference(args);
       return service.getSubtask(reference.key ?? reference.id!);
@@ -152,6 +203,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
     "create_task",
     "Create task under plan",
     { planId: z.string(), task: taskInput },
+    create,
     async (args) => service.createTask(args.planId, args.task),
   );
   tool(
@@ -167,6 +219,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
       statusId: z.string().optional(),
       effort: effort.optional(),
     },
+    update,
     async ({ id, expectedRevision, ...changes }) =>
       service.updateTask(id, expectedRevision, changes),
   );
@@ -175,6 +228,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
     "claim_task",
     "Atomically move task to configured start status",
     { id: z.string(), ...revision },
+    stateChange,
     async (args) => service.claimTask(args.id, args.expectedRevision),
   );
   tool(
@@ -188,6 +242,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
       subtasks: z.array(subtaskInput),
       replace: z.boolean().optional(),
     },
+    replaceChildren,
     async (args) =>
       service.planTask(
         args.id,
@@ -202,6 +257,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
     "create_subtask",
     "Create subtask",
     { taskId: z.string(), ...revision, subtask: subtaskInput },
+    create,
     async (args) =>
       service.createSubtask(args.taskId, args.expectedRevision, args.subtask),
   );
@@ -219,6 +275,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
       statusId: z.string().optional(),
       effort: effort.optional(),
     },
+    update,
     async ({ taskId, id, expectedRevision, ...changes }) =>
       service.updateSubtask(taskId, id, expectedRevision, changes),
   );
@@ -233,6 +290,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
       statusId: z.string(),
       ...revision,
     },
+    stateChange,
     async (args) =>
       service.moveWorkItem(
         args.kind,
@@ -252,6 +310,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
       taskId: z.string().optional(),
       ...revision,
     },
+    archive,
     async (args) =>
       service.archiveWorkItem(
         args.kind,
@@ -270,6 +329,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
       taskId: z.string().optional(),
       ...revision,
     },
+    stateChange,
     async (args) =>
       service.restoreWorkItem(
         args.kind,
@@ -283,6 +343,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
     "get_workflow",
     "Get workflow statuses and start status",
     {},
+    readOnly,
     async () => service.getWorkflow(),
   );
   return server;
@@ -295,6 +356,7 @@ function tool<T extends z.ZodRawShape>(
   name: string,
   description: string,
   shape: T,
+  annotations: ToolAnnotations,
   handler: (args: ToolArguments<T>) => Promise<unknown>,
 ) {
   const callback = async (args: ToolArguments<T>) => {
@@ -320,7 +382,7 @@ function tool<T extends z.ZodRawShape>(
   };
   server.registerTool(
     name,
-    { description, inputSchema: shape },
+    { description, inputSchema: shape, annotations },
     callback as never,
   );
 }

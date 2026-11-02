@@ -1,6 +1,6 @@
 # Agent and MCP Guide
 
-Taskdroid exposes the current local project through an MCP server over stdio. For human setup and dashboard use, see the [User Guide](user-guide.md).
+Taskdroid exposes the current local project through an MCP server over stdio. For human setup and dashboard use, see the [User Guide](user-guide.md). To connect a project to ChatGPT through OpenAI Secure MCP Tunnel, follow the [ChatGPT Tunnel Guide](chatgpt-tunnel-guide.md), which covers project-specific setup, credential boundaries, and current limitations.
 
 ## Configure an MCP client
 
@@ -32,6 +32,8 @@ Use the absolute path to the project containing `.taskdroid/project.json`. Proje
 8. Move completed work to the project's review status; do not assume a status ID that is not in the current workflow.
 
 Mutations require the current `expectedRevision`. Task and plan status are independent from child status. Archiving is soft deletion; use the matching restore tool when needed. Never edit `.taskdroid/` JSON directly.
+
+MCP tool annotations describe whether an operation is read-only, may replace or archive data, and whether repeating it is safe. These values are hints for clients, not permissions or guarantees. Each MCP client controls its own confirmation behavior; Taskdroid still enforces the operation's input validation and revision checks when a call is made.
 
 ## Tool reference
 

@@ -5,7 +5,6 @@ import { basename } from "node:path";
 import { createInterface } from "node:readline/promises";
 import open from "open";
 import {
-  findProjectRoot,
   TaskdroidError,
   TaskdroidService,
 } from "@culto/taskdroid-core";
@@ -20,6 +19,7 @@ import {
   startDashboardServer,
 } from "./dashboardServer.js";
 import { resolveWebRoot } from "./webAssets.js";
+import { resolveProjectRoot } from "./projectSelection.js";
 
 const { version } = JSON.parse(
   readFileSync(new URL("../package.json", import.meta.url), "utf8"),
@@ -91,8 +91,11 @@ program
 
 program
   .command("mcp")
+  .option("--project <directory>", "project directory (defaults to cwd discovery)")
   .description("Run stdio MCP server")
-  .action(async () => runMcpServer(await currentService()));
+  .action(async ({ project }) =>
+    runMcpServer(await currentService(project)),
+  );
 program
   .command("validate")
   .description("Validate project data")
@@ -109,15 +112,15 @@ program.parseAsync().catch((error) => {
   process.exitCode = 1;
 });
 
-async function currentService(): Promise<TaskdroidService> {
-  return (await currentProject()).service;
+async function currentService(projectDirectory?: string): Promise<TaskdroidService> {
+  return (await currentProject(projectDirectory)).service;
 }
 
-async function currentProject(): Promise<{
+async function currentProject(projectDirectory?: string): Promise<{
   root: string;
   service: TaskdroidService;
 }> {
-  const root = await findProjectRoot();
+  const root = await resolveProjectRoot(projectDirectory);
   return { root, service: await TaskdroidService.open(root) };
 }
 

@@ -43,6 +43,10 @@ taskdroid ui
 
 The dashboard opens at `http://127.0.0.1:4317` by default. Run `taskdroid mcp` from the project directory to connect an MCP client over stdio. See the [User Guide](docs/user-guide.md) and [Agent and MCP Guide](docs/agent-mcp-guide.md) for setup and workflows.
 
+To connect a local project to ChatGPT through OpenAI Secure MCP Tunnel, see the [ChatGPT Tunnel Guide](docs/chatgpt-tunnel-guide.md).
+
+To access the dashboard privately from another device on your tailnet, see the [Tailscale Dashboard Guide](docs/tailscale-dashboard-guide.md).
+
 ## Commands
 
 - `taskdroid init [--name <name>] [--manage-agent-instructions]` initializes the current directory; interactive use may offer to manage its root `AGENTS.md`.

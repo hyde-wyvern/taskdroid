@@ -29,6 +29,90 @@ describe("MCP contract", () => {
     ]);
     try {
       const tools = await client.listTools();
+      const toolsByName = new Map(tools.tools.map((tool) => [tool.name, tool]));
+      expect([...toolsByName.keys()]).toEqual([
+        "get_project",
+        "list_documents",
+        "get_document",
+        "update_document",
+        "list_plans",
+        "get_plan",
+        "create_plan",
+        "update_plan",
+        "archive_plan",
+        "restore_plan",
+        "list_tasks",
+        "get_task",
+        "get_subtask",
+        "create_task",
+        "update_task",
+        "claim_task",
+        "plan_task",
+        "create_subtask",
+        "update_subtask",
+        "move_work_item",
+        "archive_work_item",
+        "restore_work_item",
+        "get_workflow",
+      ]);
+      const readOnlyNames = [
+        "get_project",
+        "list_documents",
+        "get_document",
+        "list_plans",
+        "get_plan",
+        "list_tasks",
+        "get_task",
+        "get_subtask",
+        "get_workflow",
+      ];
+      for (const name of readOnlyNames)
+        expect(toolsByName.get(name)?.annotations).toEqual({
+          readOnlyHint: true,
+          destructiveHint: false,
+          idempotentHint: true,
+          openWorldHint: false,
+        });
+      for (const name of ["create_plan", "create_task", "create_subtask"])
+        expect(toolsByName.get(name)?.annotations).toEqual({
+          readOnlyHint: false,
+          destructiveHint: false,
+          idempotentHint: false,
+          openWorldHint: false,
+        });
+      for (const name of [
+        "update_document",
+        "update_plan",
+        "update_task",
+        "update_subtask",
+        "archive_plan",
+        "archive_work_item",
+        "plan_task",
+      ])
+        expect(toolsByName.get(name)?.annotations).toEqual({
+          readOnlyHint: false,
+          destructiveHint: true,
+          idempotentHint: false,
+          openWorldHint: false,
+        });
+      for (const name of [
+        "restore_plan",
+        "claim_task",
+        "move_work_item",
+        "restore_work_item",
+      ])
+        expect(toolsByName.get(name)?.annotations).toEqual({
+          readOnlyHint: false,
+          destructiveHint: false,
+          idempotentHint: false,
+          openWorldHint: false,
+        });
+      expect(toolsByName.get("plan_task")?.inputSchema).toMatchObject({
+        required: ["id", "expectedRevision", "plan", "subtasks"],
+      });
+      expect(
+        Object.keys(toolsByName.get("plan_task")?.inputSchema.properties ?? {}),
+      ).toEqual(["id", "expectedRevision", "plan", "subtasks", "replace"]);
       expect(tools.tools.map((tool) => tool.name)).toContain("create_plan");
       expect(tools.tools.map((tool) => tool.name)).toEqual(
         expect.arrayContaining(["get_project", "get_workflow"]),
@@ -109,6 +193,17 @@ describe("MCP contract", () => {
       });
       expect(createdSubtask.isError).not.toBe(true);
       const updatedTask = await service.getTask(task.id);
+      const staleUpdate = await client.callTool({
+        name: "update_task",
+        arguments: {
+          id: task.id,
+          expectedRevision: task.revision,
+          title: "Stale MCP edit",
+        },
+      });
+      expect(staleUpdate.isError).toBe(true);
+      expect(JSON.stringify(staleUpdate.content)).toContain("REVISION_CONFLICT");
+      expect((await service.getTask(task.id)).title).toBe(task.title);
       const subtask = updatedTask.subtasks[0];
       const subtaskByKey = await client.callTool({
         name: "get_subtask",
