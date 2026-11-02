@@ -228,7 +228,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
     "claim_task",
     "Atomically move task to configured start status",
     { id: z.string(), ...revision },
-    stateChange,
+    update,
     async (args) => service.claimTask(args.id, args.expectedRevision),
   );
   tool(
@@ -290,7 +290,7 @@ export function createMcpServer(service: TaskdroidService): McpServer {
       statusId: z.string(),
       ...revision,
     },
-    stateChange,
+    update,
     async (args) =>
       service.moveWorkItem(
         args.kind,

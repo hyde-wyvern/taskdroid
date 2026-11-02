@@ -88,6 +88,8 @@ describe("MCP contract", () => {
         "archive_plan",
         "archive_work_item",
         "plan_task",
+        "claim_task",
+        "move_work_item",
       ])
         expect(toolsByName.get(name)?.annotations).toEqual({
           readOnlyHint: false,
@@ -97,8 +99,6 @@ describe("MCP contract", () => {
         });
       for (const name of [
         "restore_plan",
-        "claim_task",
-        "move_work_item",
         "restore_work_item",
       ])
         expect(toolsByName.get(name)?.annotations).toEqual({
